@@ -72,7 +72,8 @@ source venv/bin/activate
 
 # Load environment
 if [ -f ".env" ]; then
-    export $(cat .env | grep -v '^#' | xargs)
+    # Export variables, ignore comments and blank lines
+    export $(grep -v '^#' .env | grep -v '^$' | cut -d'#' -f1 | xargs)
 fi
 
 if [ "$1" == "--dev" ]; then
