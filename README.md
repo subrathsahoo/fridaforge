@@ -47,7 +47,7 @@ FridaForge is an **intelligent mobile security analysis tool** that reads actual
 
 ```bash
 # Clone repository
-git clone https://github.com/YOUR_USERNAME/fridaforge.git
+git clone https://github.com/subrathsahoo/fridaforge.git
 cd fridaforge
 
 # One-command setup (installs everything)
