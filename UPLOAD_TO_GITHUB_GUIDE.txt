@@ -1,0 +1,354 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                                                                              ║
+║              📤 STEP-BY-STEP GITHUB UPLOAD GUIDE FOR BEGINNERS 📤            ║
+║                                                                              ║
+║                         FridaForge Upload Instructions                       ║
+║                                                                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+
+✅ YOU'VE ALREADY DONE:
+═══════════════════════════════════════════════════════════════════════════════
+1. Created GitHub repository ✅
+2. FridaForge code is ready at: /app/fridaforge/ ✅
+3. Git is initialized ✅
+
+
+📋 WHAT YOU NEED:
+═══════════════════════════════════════════════════════════════════════════════
+1. Your GitHub username
+2. Your GitHub repository name (probably "fridaforge")
+3. Terminal access to /app/fridaforge/
+
+
+🚀 METHOD 1: UPLOAD USING TERMINAL (EASIEST)
+═══════════════════════════════════════════════════════════════════════════════
+
+STEP 1: Open Terminal and Go to FridaForge Folder
+──────────────────────────────────────────────────
+cd /app/fridaforge
+
+
+STEP 2: Check What Files Are Ready
+───────────────────────────────────
+Run this command to see all files that will be uploaded:
+
+git status
+
+You should see:
+  ✅ 18 files ready to commit
+  ✅ On branch master
+
+
+STEP 3: Rename Branch to "main" (GitHub Standard)
+──────────────────────────────────────────────────
+git branch -M main
+
+
+STEP 4: Connect to Your GitHub Repository
+──────────────────────────────────────────
+⚠️ IMPORTANT: Replace YOUR_USERNAME with your actual GitHub username!
+
+git remote add origin https://github.com/YOUR_USERNAME/fridaforge.git
+
+Example:
+  If your username is "johndoe", use:
+  git remote add origin https://github.com/johndoe/fridaforge.git
+
+
+STEP 5: Verify Connection
+──────────────────────────
+git remote -v
+
+You should see:
+  origin  https://github.com/YOUR_USERNAME/fridaforge.git (fetch)
+  origin  https://github.com/YOUR_USERNAME/fridaforge.git (push)
+
+
+STEP 6: Push to GitHub! 🚀
+───────────────────────────
+git push -u origin main
+
+📌 WHAT HAPPENS:
+  - GitHub will ask for username → Type your GitHub username
+  - GitHub will ask for password → Type your GitHub password
+    OR use Personal Access Token (if 2FA enabled)
+  - Files will upload (takes 10-30 seconds)
+  - You'll see "100%" when done!
+
+
+STEP 7: Verify Upload Success ✅
+─────────────────────────────────
+Go to your browser and visit:
+https://github.com/YOUR_USERNAME/fridaforge
+
+You should see:
+  ✅ All 18 files visible
+  ✅ README.md displayed at bottom
+  ✅ Green "main" branch indicator
+
+
+═══════════════════════════════════════════════════════════════════════════════
+
+
+🔐 IF GITHUB ASKS FOR PASSWORD AND IT DOESN'T WORK:
+═══════════════════════════════════════════════════════════════════════════════
+
+GitHub now requires Personal Access Token (not password) for command line.
+
+CREATE TOKEN:
+1. Go to: https://github.com/settings/tokens
+2. Click "Generate new token" → "Generate new token (classic)"
+3. Name it: "FridaForge Upload"
+4. Select scope: ☑️ repo (check this box)
+5. Click "Generate token"
+6. COPY the token (looks like: ghp_xxxxxxxxxxxx)
+7. ⚠️ SAVE IT SOMEWHERE - you can't see it again!
+
+USE TOKEN:
+When git push asks for password, paste the TOKEN instead!
+
+
+═══════════════════════════════════════════════════════════════════════════════
+
+
+💻 METHOD 2: USING VSCODE (IF YOU PREFER GUI)
+═══════════════════════════════════════════════════════════════════════════════
+
+OPTION A: Download First, Then Upload
+──────────────────────────────────────
+
+STEP 1: Download FridaForge to Your Computer
+1. Open terminal on your local machine
+2. Run: scp -r root@YOUR_SERVER_IP:/app/fridaforge ~/Desktop/fridaforge
+   (This copies the folder to your desktop)
+
+STEP 2: Open in VSCode
+1. Open VSCode
+2. File → Open Folder → Select ~/Desktop/fridaforge
+
+STEP 3: Initialize Git in VSCode
+1. Click "Source Control" icon (left sidebar, looks like branch)
+2. Click "Initialize Repository"
+3. Click "+" to stage all files
+
+STEP 4: Commit
+1. Type commit message: "⚔️ FridaForge v1.0.0 - Initial Release"
+2. Click ✓ (checkmark) or press Ctrl+Enter
+
+STEP 5: Add Remote & Push
+1. Click "..." (three dots) in Source Control
+2. Click "Remote" → "Add Remote"
+3. Enter: https://github.com/YOUR_USERNAME/fridaforge.git
+4. Name it: origin
+5. Click "..." again → "Push"
+6. Select "origin" and "main" branch
+
+
+OPTION B: Direct Upload from Server (Advanced)
+───────────────────────────────────────────────
+1. Open VSCode
+2. File → Open Folder → Browse to: /app/fridaforge
+3. Follow STEP 3-5 from Option A above
+
+
+═══════════════════════════════════════════════════════════════════════════════
+
+
+📂 WHAT FILES WILL BE UPLOADED:
+═══════════════════════════════════════════════════════════════════════════════
+
+✅ THESE 18 FILES WILL BE UPLOADED:
+
+1. setup.sh                    ← Installation script
+2. run.sh                      ← Launch script
+3. README.md                   ← Documentation
+4. LICENSE                     ← MIT License
+5. CONTRIBUTING.md             ← Contribution guide
+6. SECURITY.md                 ← Security policy
+7. CHANGELOG.md                ← Version history
+8. .gitignore                  ← Git ignore rules
+9. .env.example                ← Config template
+10. requirements.txt           ← Python dependencies
+11. backend/server.py          ← Main backend code
+12. frontend/index.html        ← Web interface
+13. docs/AI_AGENT_ARCHITECTURE.md
+14. docs/BRANDING_OPTIONS.md
+15. SUMMARY.txt
+16. GITHUB_DEPLOY_GUIDE.txt
+17. logs/.gitkeep
+18. temp/.gitkeep
+19. uploads/.gitkeep
+
+
+❌ THESE WON'T BE UPLOADED (automatically ignored):
+
+- .env (your actual API keys) ← GOOD! Keep it secret!
+- venv/ (Python virtual environment)
+- __pycache__/ (Python cache)
+- uploads/* (user files)
+- temp/* (temporary files)
+- logs/* (log files)
+- .git/ (git internals)
+
+This is configured in .gitignore file ✅
+
+
+═══════════════════════════════════════════════════════════════════════════════
+
+
+🎯 QUICK CHECKLIST:
+═══════════════════════════════════════════════════════════════════════════════
+
+Before Pushing:
+□ You created GitHub repository
+□ You're in /app/fridaforge/ folder
+□ You have your GitHub username ready
+□ You have GitHub password or Personal Access Token
+
+After Pushing:
+□ Visit https://github.com/YOUR_USERNAME/fridaforge
+□ You see all files
+□ README.md is displayed
+□ Green "main" branch shows
+
+
+═══════════════════════════════════════════════════════════════════════════════
+
+
+❓ COMMON PROBLEMS & SOLUTIONS:
+═══════════════════════════════════════════════════════════════════════════════
+
+PROBLEM 1: "remote origin already exists"
+SOLUTION:
+git remote remove origin
+git remote add origin https://github.com/YOUR_USERNAME/fridaforge.git
+
+
+PROBLEM 2: "Permission denied (publickey)"
+SOLUTION:
+Use HTTPS (not SSH) for first time:
+git remote set-url origin https://github.com/YOUR_USERNAME/fridaforge.git
+
+
+PROBLEM 3: "Support for password authentication was removed"
+SOLUTION:
+Create Personal Access Token (see section above)
+Use token as password when pushing
+
+
+PROBLEM 4: "Updates were rejected"
+SOLUTION:
+git pull origin main --allow-unrelated-histories
+git push -u origin main
+
+
+PROBLEM 5: Can't remember GitHub username
+SOLUTION:
+Go to: https://github.com/settings/profile
+Your username is shown at top
+
+
+═══════════════════════════════════════════════════════════════════════════════
+
+
+✅ VERIFICATION STEPS:
+═══════════════════════════════════════════════════════════════════════════════
+
+After pushing, verify everything worked:
+
+1. Go to: https://github.com/YOUR_USERNAME/fridaforge
+   ✅ You should see all files listed
+
+2. Click README.md
+   ✅ You should see the FridaForge documentation
+
+3. Check file count
+   ✅ Should show "19 commits" or "18 files"
+
+4. Click "Code" button (green)
+   ✅ You should see clone URL
+
+5. Try cloning (test):
+   git clone https://github.com/YOUR_USERNAME/fridaforge.git test-clone
+   cd test-clone
+   ls -la
+   ✅ All files should be there!
+
+
+═══════════════════════════════════════════════════════════════════════════════
+
+
+🎊 WHAT TO DO AFTER SUCCESSFUL UPLOAD:
+═══════════════════════════════════════════════════════════════════════════════
+
+1. ADD DESCRIPTION:
+   - Go to your repo page
+   - Click ⚙️ (settings gear) next to "About"
+   - Add: "⚔️ AI-Powered Mobile Security Analysis - Where Code Meets Bypasses"
+   - Add topics: frida, mobile-security, ai, apk-analysis, vapt
+
+2. ENABLE FEATURES:
+   - Settings → Features
+   - ☑️ Enable Issues
+   - ☑️ Enable Discussions (optional)
+
+3. CREATE FIRST RELEASE:
+   - Click "Releases" → "Create a new release"
+   - Tag: v1.0.0
+   - Title: ⚔️ FridaForge v1.0.0 - Initial Release
+   - Publish!
+
+4. STAR YOUR OWN REPO:
+   - Click ⭐ Star button (top right)
+   - This encourages others to star too!
+
+5. SHARE IT:
+   - Twitter, LinkedIn, Reddit
+   - Security communities
+   - Your network
+
+
+═══════════════════════════════════════════════════════════════════════════════
+
+
+📞 NEED HELP?
+═══════════════════════════════════════════════════════════════════════════════
+
+If you get stuck at any step:
+
+1. Copy the exact error message
+2. Let me know which step you're on
+3. I'll help you fix it immediately!
+
+Most common issue is just authentication (password/token).
+Solution: Use Personal Access Token instead of password.
+
+
+═══════════════════════════════════════════════════════════════════════════════
+
+
+🎯 RECOMMENDED: FASTEST METHOD
+═══════════════════════════════════════════════════════════════════════════════
+
+Just run these 4 commands in terminal:
+
+cd /app/fridaforge
+git branch -M main
+git remote add origin https://github.com/YOUR_USERNAME/fridaforge.git
+git push -u origin main
+
+(Replace YOUR_USERNAME with your actual username)
+
+Enter your GitHub username and token when asked.
+
+DONE! ✅
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                                                                              ║
+║                    🎉 YOU'VE GOT THIS! JUST 4 COMMANDS! 🎉                   ║
+║                                                                              ║
+║               FridaForge will be on GitHub in 30 seconds! ⚔️                 ║
+║                                                                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝

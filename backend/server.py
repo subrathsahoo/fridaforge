@@ -19,7 +19,7 @@ import re
 import json
 import magic
 import zipfile
-from emergentintegrations.llm.chat import LlmChat, UserMessage
+from openai import AsyncOpenAI
 
 load_dotenv()
 
@@ -429,7 +429,7 @@ Start with Java.perform() and include the complete working hook."""
     
     async def generate_combined_script(self, scripts: List[FridaScript], app_info: str) -> str:
         """Generate unified bypass script for all protections found"""
-        if not self.llm_chat:
+        if not self.client:
             await self.initialize()
         
         all_scripts = "\n\n".join([f"// {s.protection_type} - {s.targeted_class}\n{s.script}" for s in scripts])
@@ -454,12 +454,20 @@ Start with Java.perform() and include the complete working hook."""
 Return ONLY the complete JavaScript code."""
         
         try:
-            message = UserMessage(text=prompt)
-            response = await self.llm_chat.send_message(message)
+            response = await self.client.chat.completions.create(
+                model="gpt-4",
+                messages=[
+                    {"role": "system", "content": "You are an expert Frida script developer. Combine multiple bypass scripts into one optimized universal script."},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.7,
+                max_tokens=2000
+            )
             
-            script_code = response.strip()
+            script_code = response.choices[0].message.content.strip()
             if script_code.startswith('```'):
-                script_code = '\n'.join(script_code.split('\n')[1:-1])
+                lines = script_code.split('\n')
+                script_code = '\n'.join(lines[1:-1]) if len(lines) > 2 else script_code
             
             return script_code
         except:
