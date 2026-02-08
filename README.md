@@ -46,21 +46,32 @@ FridaForge is an **intelligent mobile security analysis tool** that reads actual
 ### Installation
 
 ```bash
-# Clone repository
+# 1. Clone repository
 git clone https://github.com/subrathsahoo/fridaforge.git
 cd fridaforge
 
-# One-command setup (installs everything)
-sudo ./setup.sh
+# 2. Configure OpenAI API Key (REQUIRED)
+cp .env.example .env
+nano .env
+# Add your OpenAI API key:
+# OPENAI_API_KEY=sk-your-actual-key-here
 
-# Start FridaForge
+# 3. Run setup (one-time installation)
+sudo ./setup.sh
+# This installs: JADX, Apktool, MongoDB, Python dependencies
+
+# 4. Start FridaForge
 ./run.sh
 
-# Open browser
+# 5. Open browser
 http://localhost:9090
 ```
 
 **That's it!** 🎉
+
+⚠️ **IMPORTANT:** You MUST add your OpenAI API key in step 2, otherwise script generation won't work!
+
+Get your API key from: https://platform.openai.com/api-keys
 
 ---
 
@@ -140,22 +151,41 @@ FridaForge uses **10 specialized AI agents** working in parallel:
 
 ## 🛠️ Usage Examples
 
-### Command Line
+### Usage Examples
+
+#### First Time Setup
 ```bash
-# Start server
+# Clone and navigate
+git clone https://github.com/subrathsahoo/fridaforge.git
+cd fridaforge
+
+# Add OpenAI API key
+cp .env.example .env
+nano .env  # Add: OPENAI_API_KEY=sk-xxxxx
+
+# Install everything (JADX, Apktool, MongoDB, dependencies)
+sudo ./setup.sh
+
+# Start FridaForge
 ./run.sh
+```
 
-# Development mode
-./run.sh --dev
+#### Subsequent Runs
+```bash
+cd fridaforge
+./run.sh  # Just start - no setup needed
+```
 
-# Check status
-./run.sh --status
+#### Development Mode
+```bash
+./run.sh --dev  # Auto-reload on code changes
+```
 
-# View logs
-./run.sh --logs
-
-# Stop server
-./run.sh --stop
+#### Other Commands
+```bash
+./run.sh --status  # Check if running
+./run.sh --logs    # View logs
+./run.sh --stop    # Stop server
 ```
 
 ### API Usage
