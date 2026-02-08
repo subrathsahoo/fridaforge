@@ -65,9 +65,10 @@ sudo apt-get install -y \
     wget \
     unzip \
     libmagic1 \
-    mongodb \
     curl \
-    git
+    git \
+    gnupg \
+    ca-certificates
 
 echo -e "${GREEN}✓ System dependencies installed${NC}"
 
@@ -121,9 +122,59 @@ pip install -r requirements.txt -q
 echo -e "${GREEN}✓ Python dependencies installed${NC}"
 
 echo -e "\n${BLUE}[6/8] Setting up MongoDB...${NC}"
-sudo systemctl start mongodb || sudo service mongodb start
-sudo systemctl enable mongodb || echo "MongoDB service enabled"
-echo -e "${GREEN}✓ MongoDB started${NC}"
+
+# Check if MongoDB is already installed
+if command -v mongod &> /dev/null; then
+    echo -e "${GREEN}✓ MongoDB already installed${NC}"
+else
+    echo "Installing MongoDB..."
+    
+    # Detect Ubuntu version
+    UBUNTU_VERSION=$(lsb_release -rs)
+    
+    if [ "$UBUNTU_VERSION" = "24.04" ] || [ "$UBUNTU_VERSION" = "22.04" ]; then
+        # For Ubuntu 22.04+ - Install MongoDB 7.0
+        echo "Installing MongoDB 7.0 for Ubuntu ${UBUNTU_VERSION}..."
+        
+        # Import MongoDB GPG key
+        curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | sudo gpg --dearmor -o /usr/share/keyrings/mongodb-server-7.0.gpg
+        
+        # Add MongoDB repository
+        echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/7.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
+        
+        # Update and install
+        sudo apt-get update -qq
+        sudo apt-get install -y mongodb-org
+        
+    elif [ "$UBUNTU_VERSION" = "20.04" ]; then
+        # For Ubuntu 20.04 - Install MongoDB 6.0
+        echo "Installing MongoDB 6.0 for Ubuntu 20.04..."
+        
+        curl -fsSL https://www.mongodb.org/static/pgp/server-6.0.asc | sudo gpg --dearmor -o /usr/share/keyrings/mongodb-server-6.0.gpg
+        
+        echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-6.0.gpg ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+        
+        sudo apt-get update -qq
+        sudo apt-get install -y mongodb-org
+    else
+        # Fallback - try installing from default repos
+        echo "Installing MongoDB from default repositories..."
+        sudo apt-get install -y mongodb-server || sudo apt-get install -y mongodb || {
+            echo -e "${YELLOW}⚠ MongoDB installation failed. You may need to install it manually.${NC}"
+            echo -e "${YELLOW}  Visit: https://www.mongodb.com/docs/manual/installation/${NC}"
+        }
+    fi
+fi
+
+# Start MongoDB service
+if command -v mongod &> /dev/null; then
+    sudo systemctl start mongod 2>/dev/null || sudo service mongod start 2>/dev/null || echo -e "${YELLOW}⚠ Could not start MongoDB service${NC}"
+    sudo systemctl enable mongod 2>/dev/null || echo "MongoDB service configured"
+    echo -e "${GREEN}✓ MongoDB setup complete${NC}"
+else
+    echo -e "${YELLOW}⚠ MongoDB not found. FridaForge needs MongoDB to store analysis results.${NC}"
+    echo -e "${YELLOW}  You can install it manually: https://www.mongodb.com/docs/manual/installation/${NC}"
+fi
 
 echo -e "\n${BLUE}[7/8] Creating necessary directories...${NC}"
 mkdir -p uploads
