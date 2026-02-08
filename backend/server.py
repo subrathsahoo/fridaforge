@@ -901,6 +901,99 @@ async def download_script(analysis_id: str, script_type: str):
         media_type="application/javascript"
     )
 
+@api_router.post("/improve-script")
+async def improve_script_with_error(
+    analysis_id: str,
+    script_type: str,
+    frida_error: str
+):
+    """Improve Frida script based on user-reported error"""
+    try:
+        analysis = await db.analyses.find_one({"id": analysis_id})
+        if not analysis:
+            raise HTTPException(status_code=404, detail="Analysis not found")
+        
+        if analysis["status"] != "completed":
+            raise HTTPException(status_code=400, detail="Analysis not completed")
+        
+        # Find the script
+        scripts = analysis.get("frida_scripts", [])
+        matching_script = next((s for s in scripts if s["protection_type"] == script_type), None)
+        
+        if not matching_script:
+            raise HTTPException(status_code=404, detail=f"Script for {script_type} not found")
+        
+        logger.info(f"[{analysis_id}] Improving {script_type} script based on Frida error")
+        logger.info(f"[{analysis_id}] Error reported: {frida_error[:200]}")
+        
+        # Use AI to improve the script
+        script_generator = AIFridaScriptGenerator()
+        await script_generator.initialize()
+        
+        improvement_prompt = f"""A user tried this Frida script and got an error. Please fix it:
+
+**Original Script:**
+```javascript
+{matching_script["script"]}
+```
+
+**Frida Error:**
+```
+{frida_error}
+```
+
+**Task:**
+1. Analyze the error message
+2. Understand what went wrong (wrong method signature, missing overload, wrong class path, etc.)
+3. Fix the script to work correctly
+4. Add better error handling
+5. Include comments explaining the fix
+
+Return ONLY the fixed JavaScript code."""
+        
+        response = await script_generator.client.chat.completions.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": "You are a Frida expert. Fix broken scripts based on error messages."},
+                {"role": "user", "content": improvement_prompt}
+            ],
+            temperature=0.7,
+            max_tokens=2000
+        )
+        
+        improved_script = response.choices[0].message.content.strip()
+        
+        # Clean up markdown
+        if improved_script.startswith('```'):
+            lines = improved_script.split('\n')
+            improved_script = '\n'.join(lines[1:-1]) if len(lines) > 2 else improved_script
+        
+        # Update the script in database
+        for i, script in enumerate(scripts):
+            if script["protection_type"] == script_type:
+                scripts[i]["script"] = improved_script
+                scripts[i]["explanation"] = f"Improved based on Frida error: {frida_error[:100]}"
+                break
+        
+        await db.analyses.update_one(
+            {"id": analysis_id},
+            {"$set": {"frida_scripts": scripts}}
+        )
+        
+        logger.info(f"[{analysis_id}] ✓ Script improved successfully")
+        
+        return {
+            "message": "Script improved successfully",
+            "improved_script": improved_script,
+            "explanation": "Fixed based on your Frida error"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Script improvement error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.websocket("/ws/{analysis_id}")
 async def websocket_endpoint(websocket: WebSocket, analysis_id: str):
     """WebSocket for real-time progress"""

@@ -57,7 +57,7 @@ sudo ./setup.sh
 ./run.sh
 
 # Open browser
-http://localhost:8000
+http://localhost:9090
 ```
 
 **That's it!** 🎉
@@ -161,14 +161,14 @@ FridaForge uses **10 specialized AI agents** working in parallel:
 ### API Usage
 ```bash
 # Upload APK
-curl -X POST http://localhost:8000/api/upload \
+curl -X POST http://localhost:9090/api/upload \
   -F "file=@app.apk"
 
 # Get analysis
-curl http://localhost:8000/api/analysis/{id}
+curl http://localhost:9090/api/analysis/{id}
 
 # Download scripts
-curl http://localhost:8000/api/download/{id}/combined
+curl http://localhost:9090/api/download/{id}/combined
 ```
 
 ---
@@ -223,7 +223,7 @@ DB_NAME=fridaforge
 OPENAI_API_KEY=sk-your-openai-api-key-here
 
 # Server
-HOST=0.0.0.0
+HOST=127.0.0.1
 PORT=8000
 
 # Limits
@@ -326,7 +326,7 @@ Types: root_detection, ssl_pinning, combined
 
 #### WebSocket Progress
 ```javascript
-ws://localhost:8000/api/ws/{id}
+ws://localhost:9090/api/ws/{id}
 
 Messages: {
   "status": "analyzing",

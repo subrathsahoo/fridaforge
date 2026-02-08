@@ -37,7 +37,7 @@ fi
 if [ "$1" == "--status" ]; then
     if pgrep -f "uvicorn backend.server:app" > /dev/null; then
         echo -e "${GREEN}✓ VAPT Mobile Analyzer is running${NC}"
-        echo -e "${BLUE}Access at: http://localhost:8000${NC}"
+        echo -e "${BLUE}Access at: http://localhost:9090${NC}"
     else
         echo -e "${RED}✗ VAPT Mobile Analyzer is not running${NC}"
     fi
@@ -77,10 +77,10 @@ fi
 
 if [ "$1" == "--dev" ]; then
     echo -e "${YELLOW}Starting in development mode...${NC}"
-    cd backend && uvicorn server:app --host ${HOST:-0.0.0.0} --port ${PORT:-8000} --reload
+    cd backend && uvicorn server:app --host ${HOST:-127.0.0.1} --port ${PORT:-9090} --reload
 else
     echo -e "${GREEN}Starting server...${NC}"
-    echo -e "${BLUE}Access the web interface at: http://localhost:${PORT:-8000}${NC}"
+    echo -e "${BLUE}Access the web interface at: http://localhost:${PORT:-9090}${NC}"
     echo ""
-    cd backend && uvicorn server:app --host ${HOST:-0.0.0.0} --port ${PORT:-8000} --log-level info
+    cd backend && uvicorn server:app --host ${HOST:-127.0.0.1} --port ${PORT:-9090} --log-level info
 fi
