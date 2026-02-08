@@ -1,0 +1,25 @@
+# Core Framework
+fastapi==0.110.1
+uvicorn[standard]==0.25.0
+python-multipart>=0.0.9
+
+# Database
+motor==3.3.1
+pymongo==4.5.0
+
+# AI Integration
+emergentintegrations==0.1.0
+
+# File Processing
+python-magic==0.4.27
+
+# Security & Validation
+python-dotenv>=1.0.1
+cryptography>=42.0.8
+
+# Utilities
+requests>=2.31.0
+aiofiles>=23.2.1
+
+# WebSockets
+websockets==15.0.1

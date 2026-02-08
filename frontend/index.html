@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚔️ FridaForge - AI-Powered Mobile Security Analysis</title>
+    <meta name="description" content="Generate custom Frida bypass scripts from real code analysis">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            animation: fadeIn 1s;
+        }
+        .header h1 {
+            font-size: 3.5em;
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+        .logo {
+            font-size: 1.2em;
+            animation: pulse 2s infinite;
+        }
+        .tagline {
+            font-size: 1.3em;
+            opacity: 0.95;
+            font-weight: 300;
+            margin-top: 10px;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+            animation: slideUp 0.5s;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .upload-zone {
+            border: 3px dashed #667eea;
+            border-radius: 12px;
+            padding: 60px 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
+        }
+        .upload-zone:hover {
+            border-color: #764ba2;
+            background: linear-gradient(135deg, #e8ebff 0%, #f8f9ff 100%);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+        }
+        .upload-zone.dragover {
+            background: linear-gradient(135deg, #e8ebff 0%, #d4d9ff 100%);
+            border-color: #764ba2;
+            border-style: solid;
+        }
+        .upload-icon {
+            font-size: 5em;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 10px;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        }
+        .btn:active {
+            transform: translateY(-1px);
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .progress-container {
+            display: none;
+            margin: 30px 0;
+            animation: fadeIn 0.5s;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 35px;
+            background: linear-gradient(90deg, #e0e0e0 0%, #f0f0f0 100%);
+            border-radius: 17px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+        }
+        .progress-text {
+            text-align: center;
+            margin-top: 10px;
+            color: #666;
+            font-weight: 500;
+        }
+        .analysis-list { display: grid; gap: 20px; }
+        .analysis-item {
+            background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .analysis-item:hover {
+            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.2);
+            transform: translateX(5px) translateY(-2px);
+            border-left-width: 6px;
+        }
+        .filename {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .status {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .status.completed { background: #d4edda; color: #155724; }
+        .status.processing { background: #fff3cd; color: #856404; animation: pulse 1.5s infinite; }
+        .status.failed { background: #f8d7da; color: #721c24; }
+        .status.pending { background: #d1ecf1; color: #0c5460; }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        .tab {
+            padding: 12px 25px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            font-weight: 500;
+            color: #666;
+        }
+        .tab:hover { color: #667eea; background: #f8f9ff; border-radius: 8px 8px 0 0; }
+        .tab.active {
+            border-bottom-color: #667eea;
+            color: #667eea;
+            font-weight: 700;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.5s; }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s;
+        }
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            max-width: 900px;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            animation: slideUp 0.3s;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+        }
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            font-size: 2.5em;
+            cursor: pointer;
+            color: #999;
+            transition: all 0.3s;
+            line-height: 1;
+        }
+        .close-modal:hover { color: #667eea; transform: rotate(90deg); }
+        .script-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 0.95em;
+            transition: all 0.3s;
+            box-shadow: 0 3px 10px rgba(40, 167, 69, 0.3);
+        }
+        .script-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(40, 167, 69, 0.5);
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        .badge.ai { background: #764ba2; color: white; }
+        .badge.fast { background: #10b981; color: white; }
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            opacity: 0.9;
+            font-size: 0.9em;
+        }
+        .footer a { color: white; text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                <span class="logo">⚔️</span>
+                FridaForge
+                <span class="logo">⚔️</span>
+            </h1>
+            <p class="tagline">AI-Powered Mobile Security Analysis • Where Code Meets Bypasses</p>
+            <div style="margin-top: 15px;">
+                <span class="badge ai">🤖 AI-Powered</span>
+                <span class="badge fast">⚡ 10x Faster</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('upload')">📤 Upload & Analyze</div>
+                <div class="tab" onclick="switchTab('history')">📜 Analysis History</div>
+            </div>
+
+            <div id="upload-tab" class="tab-content active">
+                <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+                    <div class="upload-icon">📱</div>
+                    <h2>Drop APK/IPA file here or click to browse</h2>
+                    <p style="margin-top: 15px; color: #666; font-size: 1.1em;">Max size: 1GB • APK & IPA supported</p>
+                    <p style="margin-top: 8px; color: #999;">AI will read the actual code and generate custom Frida scripts</p>
+                    <input type="file" id="fileInput" accept=".apk,.ipa" style="display: none;" onchange="handleFile(this.files[0])">
+                    <button class="btn" style="margin-top: 25px;">⚔️ Select File to Analyze</button>
+                </div>
+
+                <div class="progress-container" id="progressContainer">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill" style="width: 0%">0%</div>
+                    </div>
+                    <div class="progress-text" id="progressText">Uploading...</div>
+                </div>
+            </div>
+
+            <div id="history-tab" class="tab-content">
+                <h2 style="margin-bottom: 20px; color: #333;">📊 Recent Analyses</h2>
+                <div class="analysis-list" id="analysisList">
+                    <p style="text-align: center; color: #666; padding: 40px;">Loading...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>⚔️ <strong>FridaForge</strong> - Made with ❤️ for Security Professionals</p>
+            <p style="margin-top: 5px; font-size: 0.85em;">Powered by AI • GPT-5.2 • Multi-Agent Analysis</p>
+        </div>
+    </div>
+
+    <div class="modal" id="detailsModal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+        let currentAnalysisId = null;
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            
+            if (tab === 'upload') {
+                document.querySelector('.tab:nth-child(1)').classList.add('active');
+                document.getElementById('upload-tab').classList.add('active');
+            } else {
+                document.querySelector('.tab:nth-child(2)').classList.add('active');
+                document.getElementById('history-tab').classList.add('active');
+                loadAnalyses();
+            }
+        }
+
+        const uploadZone = document.getElementById('uploadZone');
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('dragover');
+        });
+        uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+            if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+        });
+
+        async function handleFile(file) {
+            if (!file) return;
+            if (!file.name.match(/\.(apk|ipa)$/i)) {
+                alert('⚠️ Please select an APK or IPA file');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            document.getElementById('progressContainer').style.display = 'block';
+            document.getElementById('uploadZone').style.display = 'none';
+
+            try {
+                const response = await fetch(`${API_BASE}/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    currentAnalysisId = data.analysis_id;
+                    updateProgress(10, '⚔️ FridaForge analyzing...');
+                    connectWebSocket(data.analysis_id);
+                    
+                    setTimeout(() => {
+                        switchTab('history');
+                        resetUpload();
+                    }, 2000);
+                } else {
+                    alert('❌ Upload failed: ' + data.detail);
+                    resetUpload();
+                }
+            } catch (error) {
+                alert('❌ Upload error: ' + error.message);
+                resetUpload();
+            }
+        }
+
+        function updateProgress(percent, message) {
+            document.getElementById('progressFill').style.width = percent + '%';
+            document.getElementById('progressFill').textContent = Math.round(percent) + '%';
+            document.getElementById('progressText').textContent = message;
+        }
+
+        function resetUpload() {
+            document.getElementById('progressContainer').style.display = 'none';
+            document.getElementById('uploadZone').style.display = 'block';
+            document.getElementById('fileInput').value = '';
+        }
+
+        function connectWebSocket(analysisId) {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const ws = new WebSocket(`${protocol}//${window.location.host}/api/ws/${analysisId}`);
+            
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                updateProgress(data.progress, data.message);
+                
+                if (data.status === 'completed') {
+                    loadAnalyses();
+                    ws.close();
+                }
+            };
+        }
+
+        async function loadAnalyses() {
+            try {
+                const response = await fetch(`${API_BASE}/analyses`);
+                const analyses = await response.json();
+                
+                const listEl = document.getElementById('analysisList');
+                
+                if (analyses.length === 0) {
+                    listEl.innerHTML = '<p style="text-align: center; color: #666; padding: 60px;">📭 No analyses yet. Upload an APK/IPA to get started!</p>';
+                    return;
+                }
+                
+                listEl.innerHTML = analyses.map(a => `
+                    <div class="analysis-item" onclick="viewDetails('${a.id}')">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <div class="filename">
+                                ${a.file_type === 'apk' ? '📱' : '🍎'} ${a.filename}
+                            </div>
+                            <div class="status ${a.status}">${a.status}</div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; font-size: 0.9em; color: #666;">
+                            <div>📅 ${new Date(a.created_at).toLocaleString()}</div>
+                            <div>📦 ${a.file_size || 'N/A'}</div>
+                            ${a.status === 'completed' ? `
+                            <div>🔍 ${a.detections?.length || 0} protections</div>
+                            <div>⚔️ ${a.frida_scripts?.length || 0} scripts</div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Failed to load analyses:', error);
+            }
+        }
+
+        async function viewDetails(analysisId) {
+            try {
+                const response = await fetch(`${API_BASE}/analysis/${analysisId}`);
+                const analysis = await response.json();
+                
+                let content = `
+                    <h2 style="margin-bottom: 20px; color: #667eea;">⚔️ FridaForge Analysis Results</h2>
+                    <h3 style="margin: 20px 0; color: #333;">${analysis.filename}</h3>
+                    <p style="color: #666;"><strong>Package:</strong> ${analysis.package_name || 'N/A'}</p>
+                    <p style="color: #666; margin-top: 8px;"><strong>Status:</strong> <span class="status ${analysis.status}">${analysis.status}</span></p>
+                `;
+                
+                if (analysis.status === 'completed' && analysis.detections) {
+                    content += `
+                        <h3 style="margin-top: 35px; color: #333;">🔍 Security Protections Found (${analysis.detections.length})</h3>
+                        ${analysis.detections.slice(0, 10).map(d => `
+                            <div style="background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%); padding: 18px; margin: 12px 0; border-radius: 10px; border-left: 4px solid #667eea;">
+                                <strong style="color: #667eea; font-size: 1.05em;">${d.type.replace(/_/g, ' ').toUpperCase()}</strong>
+                                <p style="margin-top: 8px; font-size: 0.9em; color: #666;">📍 <code>${d.class_name}.${d.method_name}</code></p>
+                                <p style="margin-top: 6px; color: #777; font-size: 0.9em;">${d.description}</p>
+                            </div>
+                        `).join('')}
+                        
+                        <h3 style="margin-top: 35px; color: #333;">⚔️ Generated Frida Bypass Scripts</h3>
+                        <div style="background: #f8f9ff; padding: 20px; border-radius: 10px; margin: 15px 0;">
+                            ${analysis.frida_scripts.map(s => `
+                                <button class="script-btn" onclick="downloadScript('${analysis.id}', '${s.protection_type}')">
+                                    ⬇️ ${s.protection_type.replace(/_/g, ' ')}
+                                </button>
+                            `).join('')}
+                            <button class="script-btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); margin-top: 15px; width: 100%; font-size: 1.1em;" onclick="downloadScript('${analysis.id}', 'combined')">
+                                ⚔️ Download Universal Bypass Script (All Protections)
+                            </button>
+                        </div>
+                    `;
+                } else if (analysis.status === 'failed') {
+                    content += `<p style="color: #ef4444; margin-top: 25px; padding: 20px; background: #fee; border-radius: 10px;">❌ <strong>Analysis Failed:</strong> ${analysis.error_message}</p>`;
+                } else if (analysis.status === 'processing') {
+                    content += `<p style="color: #f59e0b; margin-top: 25px; padding: 20px; background: #fffbeb; border-radius: 10px;">⚙️ Analysis in progress... Please wait.</p>`;
+                }
+                
+                document.getElementById('modalContent').innerHTML = content;
+                document.getElementById('detailsModal').style.display = 'flex';
+            } catch (error) {
+                alert('Failed to load details');
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('detailsModal').style.display = 'none';
+        }
+
+        function downloadScript(analysisId, scriptType) {
+            window.open(`${API_BASE}/download/${analysisId}/${scriptType}`, '_blank');
+        }
+
+        setInterval(() => {
+            if (document.getElementById('history-tab').classList.contains('active')) {
+                loadAnalyses();
+            }
+        }, 5000);
+
+        loadAnalyses();
+    </script>
+</body>
+</html>
