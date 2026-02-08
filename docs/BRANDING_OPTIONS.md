@@ -207,7 +207,7 @@ $ fridaforge analyze app.apk
 
 ### GitHub:
 ```
-github.com/YOUR_USERNAME/fridaforge
+github.com/subrathsahoo/fridaforge
 ⭐ 1.2k   🍴 234   📋 45 issues
 ```
 

@@ -6,7 +6,7 @@
 
 ### Reporting Bugs
 
-1. Check if the bug is already reported in [Issues](https://github.com/YOUR_USERNAME/fridaforge/issues)
+1. Check if the bug is already reported in [Issues](https://github.com/subrathsahoo/fridaforge/issues)
 2. If not, create a new issue with:
    - Clear title
    - Detailed description
@@ -27,7 +27,7 @@
 #### Setup Development Environment
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/fridaforge.git
+git clone https://github.com/subrathsahoo/fridaforge.git
 cd fridaforge
 ./setup.sh
 ./run.sh --dev

@@ -25,7 +25,7 @@ FridaForge is designed for **authorized security testing and research only**.
 If you discover a security vulnerability in FridaForge itself:
 
 1. **DO NOT** open a public issue
-2. Email: security@YOUR_DOMAIN.com (or your contact)
+2. Email: security@fridaforge.io.com (or your contact)
 3. Include:
    - Description of the vulnerability
    - Steps to reproduce

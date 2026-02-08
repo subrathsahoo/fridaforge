@@ -47,8 +47,8 @@ cd /app/fridaforge
 git branch -M main
 
 # Add your GitHub repository as remote
-# Replace YOUR_USERNAME with your actual GitHub username
-git remote add origin https://github.com/YOUR_USERNAME/fridaforge.git
+# Replace subrathsahoo with your actual GitHub username
+git remote add origin https://github.com/subrathsahoo/fridaforge.git
 
 # Push to GitHub
 git push -u origin main
@@ -77,7 +77,7 @@ On GitHub, go to Settings:
 
 STEP 4: Create First Release (Recommended)
 ───────────────────────────────────────────
-1. Go to: https://github.com/YOUR_USERNAME/fridaforge/releases/new
+1. Go to: https://github.com/subrathsahoo/fridaforge/releases/new
 2. Tag version: v1.0.0
 3. Release title: ⚔️ FridaForge v1.0.0 - Initial Release
 4. Description:
@@ -106,7 +106,7 @@ STEP 4: Create First Release (Recommended)
 ![Python](https://img.shields.io/badge/python-3.8+-yellow)
 ![AI](https://img.shields.io/badge/AI-GPT--5.2-purple)
 ![Platform](https://img.shields.io/badge/platform-Ubuntu%20%7C%20Debian-orange)
-![Stars](https://img.shields.io/github/stars/YOUR_USERNAME/fridaforge?style=social)
+![Stars](https://img.shields.io/github/stars/subrathsahoo/fridaforge?style=social)
 ```
 
 
@@ -141,7 +141,7 @@ Documentation: Complete
 ═══════════════════════════════════════════════════════════════════════════════
 
 # Clone (after pushing)
-git clone https://github.com/YOUR_USERNAME/fridaforge.git
+git clone https://github.com/subrathsahoo/fridaforge.git
 
 # Setup
 cd fridaforge && sudo ./setup.sh
@@ -159,11 +159,11 @@ cd fridaforge && sudo ./setup.sh
 🔗 USEFUL LINKS (Update after pushing):
 ═══════════════════════════════════════════════════════════════════════════════
 
-Repository:    https://github.com/YOUR_USERNAME/fridaforge
-Issues:        https://github.com/YOUR_USERNAME/fridaforge/issues
-Discussions:   https://github.com/YOUR_USERNAME/fridaforge/discussions
-Releases:      https://github.com/YOUR_USERNAME/fridaforge/releases
-Documentation: https://github.com/YOUR_USERNAME/fridaforge/blob/main/README.md
+Repository:    https://github.com/subrathsahoo/fridaforge
+Issues:        https://github.com/subrathsahoo/fridaforge/issues
+Discussions:   https://github.com/subrathsahoo/fridaforge/discussions
+Releases:      https://github.com/subrathsahoo/fridaforge/releases
+Documentation: https://github.com/subrathsahoo/fridaforge/blob/main/README.md
 
 
 💡 TIPS FOR SUCCESS:
@@ -192,7 +192,7 @@ Share FridaForge on:
     📱 APK/IPA support
     ⚡ 10x faster with multi-agent design
     
-    Check it out: https://github.com/YOUR_USERNAME/fridaforge
+    Check it out: https://github.com/subrathsahoo/fridaforge
     
     #CyberSecurity #MobileSecurity #Frida #AI #VAPT"
 
@@ -211,7 +211,7 @@ Share FridaForge on:
 
 1. Never commit .env file (already in .gitignore)
 2. Keep API keys secure
-3. Update YOUR_USERNAME in all examples
+3. Update subrathsahoo in all examples
 4. Test setup.sh on fresh Ubuntu before sharing
 5. Respond to GitHub issues professionally
 6. Maintain ethical use guidelines

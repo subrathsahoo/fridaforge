@@ -487,7 +487,9 @@ class DecompilationService:
         output_dir = self.temp_dir / analysis_id
         output_dir.mkdir(exist_ok=True)
         
-        logger.info(f"[{analysis_id}] Starting decompilation of {apk_path}")
+        logger.info(f"[{analysis_id}] ========================================")
+        logger.info(f"[{analysis_id}] Starting decompilation of {apk_path.name}")
+        logger.info(f"[{analysis_id}] Output directory: {output_dir}")
         
         results = {
             "manifest": None,
@@ -506,8 +508,11 @@ class DecompilationService:
             })
             
             # JADX for Java source extraction
+            logger.info(f"[{analysis_id}] Running JADX decompiler...")
             jadx_output = output_dir / "jadx"
             jadx_cmd = f"jadx -d {jadx_output} --show-bad-code --no-res {apk_path}"
+            
+            logger.info(f"[{analysis_id}] JADX command: {jadx_cmd}")
             
             process = await asyncio.create_subprocess_shell(
                 jadx_cmd,
@@ -516,8 +521,10 @@ class DecompilationService:
             )
             stdout, stderr = await process.communicate()
             
+            logger.info(f"[{analysis_id}] JADX completed with return code: {process.returncode}")
+            
             if process.returncode != 0:
-                logger.error(f"JADX failed: {stderr.decode()}")
+                logger.error(f"[{analysis_id}] JADX error: {stderr.decode()[:500]}")
             
             await manager.send_progress(analysis_id, {
                 "status": "decompiling",
@@ -526,17 +533,23 @@ class DecompilationService:
             })
             
             # Apktool for resources and manifest
+            logger.info(f"[{analysis_id}] Running Apktool for resources...")
             apktool_output = output_dir / "apktool"
             apktool_cmd = f"apktool d {apk_path} -o {apktool_output} -f"
+            
+            logger.info(f"[{analysis_id}] Apktool command: {apktool_cmd}")
             
             process = await asyncio.create_subprocess_shell(
                 apktool_cmd,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE
             )
-            await process.communicate()
+            stdout, stderr = await process.communicate()
+            
+            logger.info(f"[{analysis_id}] Apktool completed with return code: {process.returncode}")
             
             # Extract manifest and package info
+            logger.info(f"[{analysis_id}] Extracting manifest and package information...")
             manifest_path = apktool_output / "AndroidManifest.xml"
             if manifest_path.exists():
                 manifest_content = manifest_path.read_text()
@@ -546,29 +559,41 @@ class DecompilationService:
                 pkg_match = re.search(r'package="([^"]+)"', manifest_content)
                 if pkg_match:
                     results["package_name"] = pkg_match.group(1)
+                    logger.info(f"[{analysis_id}] Package name: {results['package_name']}")
                 
                 # Extract app name
                 app_match = re.search(r'android:label="([^"]+)"', manifest_content)
                 if app_match:
                     results["app_name"] = app_match.group(1)
+                    logger.info(f"[{analysis_id}] App name: {results['app_name']}")
             
             # Collect all Java source files
+            logger.info(f"[{analysis_id}] Collecting Java source files...")
             if jadx_output.exists():
                 java_files = list(jadx_output.rglob("*.java"))
                 results["java_sources"] = java_files
-                logger.info(f"[{analysis_id}] Found {len(java_files)} Java files")
+                logger.info(f"[{analysis_id}] ✓ Found {len(java_files)} Java files")
             
             # Collect smali files for additional analysis
+            logger.info(f"[{analysis_id}] Collecting smali files...")
             if apktool_output.exists():
                 smali_files = list(apktool_output.rglob("*.smali"))
                 results["smali_files"] = smali_files[:100]  # Limit for performance
+                logger.info(f"[{analysis_id}] ✓ Found {len(smali_files)} smali files (using {len(results['smali_files'])})")
                 
                 # Collect native libraries
                 lib_dir = apktool_output / "lib"
                 if lib_dir.exists():
-                    results["native_libs"] = list(lib_dir.rglob("*.so"))
+                    native_libs = list(lib_dir.rglob("*.so"))
+                    results["native_libs"] = native_libs
+                    logger.info(f"[{analysis_id}] ✓ Found {len(native_libs)} native libraries (.so)")
             
-            logger.info(f"[{analysis_id}] Decompilation complete")
+            logger.info(f"[{analysis_id}] ========================================")
+            logger.info(f"[{analysis_id}] ✓ Decompilation complete!")
+            logger.info(f"[{analysis_id}]   - Java files: {len(results['java_sources'])}")
+            logger.info(f"[{analysis_id}]   - Smali files: {len(results['smali_files'])}")
+            logger.info(f"[{analysis_id}]   - Native libs: {len(results['native_libs'])}")
+            logger.info(f"[{analysis_id}] ========================================")
             return results
             
         except Exception as e:
@@ -609,7 +634,18 @@ async def process_analysis(analysis_id: str, file_path: Path, filename: str, fil
             analysis_id
         )
         
-        logger.info(f"[{analysis_id}] Found {len(detections)} security implementations")
+        logger.info(f"[{analysis_id}] ========================================")
+        logger.info(f"[{analysis_id}] ✓ Analysis complete!")
+        logger.info(f"[{analysis_id}]   Found {len(detections)} security implementations")
+        
+        # Log detection summary
+        detection_summary = {}
+        for d in detections:
+            detection_summary[d.type] = detection_summary.get(d.type, 0) + 1
+        
+        for prot_type, count in detection_summary.items():
+            logger.info(f"[{analysis_id}]   - {prot_type}: {count} detections")
+        logger.info(f"[{analysis_id}] ========================================")
         
         if len(detections) == 0:
             # No protections found
@@ -658,14 +694,19 @@ async def process_analysis(analysis_id: str, file_path: Path, filename: str, fil
             if key not in unique_detections:
                 unique_detections[key] = d
         
-        logger.info(f"[{analysis_id}] Generating scripts for {len(unique_detections)} unique protections")
+        logger.info(f"[{analysis_id}] ========================================")
+        logger.info(f"[{analysis_id}] Generating Frida scripts for {len(unique_detections)} unique protections")
+        logger.info(f"[{analysis_id}] ========================================")
         
         for idx, (key, detection) in enumerate(unique_detections.items()):
-            logger.info(f"[{analysis_id}] Generating script {idx+1}/{len(unique_detections)} for {key}")
+            logger.info(f"[{analysis_id}] [{idx+1}/{len(unique_detections)}] Generating script for: {key}")
+            logger.info(f"[{analysis_id}]   - Protection: {detection.type}")
+            logger.info(f"[{analysis_id}]   - Location: {Path(detection.location).name}")
             
             try:
                 script = await script_generator.generate_script_from_actual_code(detection)
                 frida_scripts.append(script)
+                logger.info(f"[{analysis_id}]   ✓ Script generated successfully!")
                 
                 await manager.send_progress(analysis_id, {
                     "status": "generating",
@@ -673,7 +714,7 @@ async def process_analysis(analysis_id: str, file_path: Path, filename: str, fil
                     "progress": 70 + int((idx / len(unique_detections)) * 20)
                 })
             except Exception as e:
-                logger.error(f"Failed to generate script for {key}: {e}")
+                logger.error(f"[{analysis_id}]   ✗ Failed to generate script: {str(e)[:200]}")
                 continue
         
         # Step 4: Generate combined universal script
@@ -710,11 +751,18 @@ async def process_analysis(analysis_id: str, file_path: Path, filename: str, fil
             "scripts_count": len(frida_scripts)
         })
         
-        logger.info(f"[{analysis_id}] Analysis completed successfully")
+        logger.info(f"[{analysis_id}] ========================================")
+        logger.info(f"[{analysis_id}] 🎉 Analysis completed successfully!")
+        logger.info(f"[{analysis_id}]   - Total detections: {len(unique_detections)}")
+        logger.info(f"[{analysis_id}]   - Scripts generated: {len(frida_scripts)}")
+        logger.info(f"[{analysis_id}]   - Combined script: {'Yes' if combined_script else 'No'}")
+        logger.info(f"[{analysis_id}] ========================================")
         
         # Cleanup
+        logger.info(f"[{analysis_id}] Cleaning up temporary files...")
         shutil.rmtree(decompiler.temp_dir / analysis_id, ignore_errors=True)
         file_path.unlink(missing_ok=True)
+        logger.info(f"[{analysis_id}] ✓ Cleanup complete")
         
     except Exception as e:
         logger.error(f"[{analysis_id}] Analysis error: {str(e)}", exc_info=True)

@@ -47,9 +47,9 @@ git branch -M main
 
 STEP 4: Connect to Your GitHub Repository
 ──────────────────────────────────────────
-⚠️ IMPORTANT: Replace YOUR_USERNAME with your actual GitHub username!
+⚠️ IMPORTANT: Replace subrathsahoo with your actual GitHub username!
 
-git remote add origin https://github.com/YOUR_USERNAME/fridaforge.git
+git remote add origin https://github.com/subrathsahoo/fridaforge.git
 
 Example:
   If your username is "johndoe", use:
@@ -61,8 +61,8 @@ STEP 5: Verify Connection
 git remote -v
 
 You should see:
-  origin  https://github.com/YOUR_USERNAME/fridaforge.git (fetch)
-  origin  https://github.com/YOUR_USERNAME/fridaforge.git (push)
+  origin  https://github.com/subrathsahoo/fridaforge.git (fetch)
+  origin  https://github.com/subrathsahoo/fridaforge.git (push)
 
 
 STEP 6: Push to GitHub! 🚀
@@ -80,7 +80,7 @@ git push -u origin main
 STEP 7: Verify Upload Success ✅
 ─────────────────────────────────
 Go to your browser and visit:
-https://github.com/YOUR_USERNAME/fridaforge
+https://github.com/subrathsahoo/fridaforge
 
 You should see:
   ✅ All 18 files visible
@@ -139,7 +139,7 @@ STEP 4: Commit
 STEP 5: Add Remote & Push
 1. Click "..." (three dots) in Source Control
 2. Click "Remote" → "Add Remote"
-3. Enter: https://github.com/YOUR_USERNAME/fridaforge.git
+3. Enter: https://github.com/subrathsahoo/fridaforge.git
 4. Name it: origin
 5. Click "..." again → "Push"
 6. Select "origin" and "main" branch
@@ -207,7 +207,7 @@ Before Pushing:
 □ You have GitHub password or Personal Access Token
 
 After Pushing:
-□ Visit https://github.com/YOUR_USERNAME/fridaforge
+□ Visit https://github.com/subrathsahoo/fridaforge
 □ You see all files
 □ README.md is displayed
 □ Green "main" branch shows
@@ -222,13 +222,13 @@ After Pushing:
 PROBLEM 1: "remote origin already exists"
 SOLUTION:
 git remote remove origin
-git remote add origin https://github.com/YOUR_USERNAME/fridaforge.git
+git remote add origin https://github.com/subrathsahoo/fridaforge.git
 
 
 PROBLEM 2: "Permission denied (publickey)"
 SOLUTION:
 Use HTTPS (not SSH) for first time:
-git remote set-url origin https://github.com/YOUR_USERNAME/fridaforge.git
+git remote set-url origin https://github.com/subrathsahoo/fridaforge.git
 
 
 PROBLEM 3: "Support for password authentication was removed"
@@ -257,7 +257,7 @@ Your username is shown at top
 
 After pushing, verify everything worked:
 
-1. Go to: https://github.com/YOUR_USERNAME/fridaforge
+1. Go to: https://github.com/subrathsahoo/fridaforge
    ✅ You should see all files listed
 
 2. Click README.md
@@ -270,7 +270,7 @@ After pushing, verify everything worked:
    ✅ You should see clone URL
 
 5. Try cloning (test):
-   git clone https://github.com/YOUR_USERNAME/fridaforge.git test-clone
+   git clone https://github.com/subrathsahoo/fridaforge.git test-clone
    cd test-clone
    ls -la
    ✅ All files should be there!
@@ -335,10 +335,10 @@ Just run these 4 commands in terminal:
 
 cd /app/fridaforge
 git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/fridaforge.git
+git remote add origin https://github.com/subrathsahoo/fridaforge.git
 git push -u origin main
 
-(Replace YOUR_USERNAME with your actual username)
+(Replace subrathsahoo with your actual username)
 
 Enter your GitHub username and token when asked.
 

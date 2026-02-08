@@ -422,9 +422,9 @@ MIT License - See [LICENSE](LICENSE) file for details.
 
 ## 📞 Support
 
-- 🐛 **Issues:** [GitHub Issues](https://github.com/YOUR_USERNAME/fridaforge/issues)
+- 🐛 **Issues:** [GitHub Issues](https://github.com/subrathsahoo/fridaforge/issues)
 - 📖 **Docs:** [Documentation](docs/)
-- 💬 **Discussions:** [GitHub Discussions](https://github.com/YOUR_USERNAME/fridaforge/discussions)
+- 💬 **Discussions:** [GitHub Discussions](https://github.com/subrathsahoo/fridaforge/discussions)
 
 ---
 
