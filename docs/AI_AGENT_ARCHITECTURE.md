@@ -81,7 +81,7 @@ class ScriptOptimizationAgent:
 
 | Metric | Without Agents | With Agents | Improvement |
 |--------|---------------|-------------|-------------|
-| Analysis Time | 5-10 min | 30-60 sec | **10x faster** |
+| Analysis Time | 5-10 min | efficient | **10x faster** |
 | Accuracy | 75-85% | 95-98% | **20% better** |
 | Script Quality | Good | Excellent | **Professional** |
 | False Positives | 15-20% | 2-5% | **75% reduction** |

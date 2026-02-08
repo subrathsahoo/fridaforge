@@ -58,7 +58,7 @@
 WITHOUT AGENTS (Current):              WITH AGENTS (Enhanced):
 ┌─────────────────────┐                ┌─────────────────────┐
 │  Single Analysis    │                │  Parallel Analysis  │
-│  ⏱️  5-10 minutes    │                │  ⏱️  30-60 seconds   │
+│  ⏱️  5-10 minutes    │                │  ⏱️  minutes   │
 │  🎯  75-85% accuracy │                │  🎯  95-98% accuracy │
 │  📜  Good scripts    │                │  📜  Excellent       │
 │  🔍  Basic detection │                │  🔍  Deep analysis   │
@@ -100,7 +100,7 @@ WITHOUT AGENTS (Current):              WITH AGENTS (Enhanced):
 
 Metric                Current        With Agents      Improvement
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Speed                 5-10 min       30-60 sec        10x FASTER ⚡
+Speed                 5-10 min       efficient        10x FASTER ⚡
 Accuracy              75-85%         95-98%           +20% BETTER 🎯
 Script Quality        Good           Excellent        Professional ⭐
 False Positives       15-20%         2-5%             75% REDUCTION ✅

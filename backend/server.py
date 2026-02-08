@@ -936,6 +936,31 @@ static_dir = Path(__file__).parent.parent / "frontend"
 if static_dir.exists():
     app.mount("/", StaticFiles(directory=str(static_dir), html=True), name="static")
 
+@app.on_event("startup")
+async def startup_event():
+    """Check API key on startup"""
+    api_key = os.environ.get('OPENAI_API_KEY') or os.environ.get('EMERGENT_LLM_KEY')
+    
+    if not api_key or api_key == 'sk-emergent-2A7FcC7D5433bFdC80':
+        logger.warning("=" * 80)
+        logger.warning("⚠️  WARNING: OpenAI API Key Not Configured!")
+        logger.warning("=" * 80)
+        logger.warning("")
+        logger.warning("FridaForge requires an OpenAI API key to generate Frida scripts.")
+        logger.warning("")
+        logger.warning("To add your API key:")
+        logger.warning("  1. Get your key from: https://platform.openai.com/api-keys")
+        logger.warning("  2. Copy .env.example to .env")
+        logger.warning("  3. Add your key: OPENAI_API_KEY=sk-your-key-here")
+        logger.warning("  4. Restart FridaForge: ./run.sh")
+        logger.warning("")
+        logger.warning("Without an API key, FridaForge can only decompile and detect")
+        logger.warning("protections, but cannot generate Frida bypass scripts.")
+        logger.warning("")
+        logger.warning("=" * 80)
+    else:
+        logger.info("✓ OpenAI API key configured successfully")
+
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()

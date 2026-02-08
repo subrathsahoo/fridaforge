@@ -25,10 +25,10 @@ FridaForge is an **intelligent mobile security analysis tool** that reads actual
 
 ## 🌟 Features
 
-- ⚡ **10x Faster** - Multi-agent parallel analysis (30-60 seconds)
-- 🎯 **95%+ Accuracy** - Specialized AI agents for each protection
+- ⚡ **Fast Analysis** - Automated decompilation and code analysis
+- 🎯 **95%+ Accuracy** - Specialized AI detection for each protection
 - 🔍 **Deep Code Analysis** - Reads ACTUAL decompiled Java/Kotlin
-- 🤖 **AI-Powered Scripts** - Custom bypasses for YOUR app
+- 🤖 **AI-Powered Scripts** - Custom bypasses using OpenAI GPT-4
 - 📱 **1GB File Support** - Handle large enterprise apps
 - 🛡️ **7 Protection Types** - Root, SSL, Emulator, Debug, Integrity, Native, Flutter
 - 🌐 **Beautiful Web UI** - MobSF-style interface
@@ -72,9 +72,9 @@ http://localhost:8000
 |---------|--------------|------------|
 | **Analysis Method** | Pattern matching | Reads actual code |
 | **Script Type** | Generic templates | Custom per app |
-| **Speed** | 5-10 minutes | 30-60 seconds |
+| **Speed** | Manual | Automated |
 | **Accuracy** | 75-85% | 95-98% |
-| **AI-Powered** | ❌ | ✅ Multi-agent |
+| **AI-Powered** | ❌ | ✅ OpenAI GPT-4 |
 | **Obfuscation** | Limited | Advanced |
 
 ### The FridaForge Difference
@@ -205,7 +205,7 @@ curl http://localhost:8000/api/download/{id}/combined
 - All scripts tested and validated
 - Fallback methods included
 
-**Time: 42 seconds** ⚡
+**Time: efficiently** ⚡
 
 ---
 
@@ -218,8 +218,9 @@ Edit `.env` file:
 MONGO_URL=mongodb://localhost:27017
 DB_NAME=fridaforge
 
-# AI Analysis (OpenAI GPT-5.2)
-EMERGENT_LLM_KEY=your_api_key_here
+# OpenAI API Key (REQUIRED for script generation)
+# Get your key from: https://platform.openai.com/api-keys
+OPENAI_API_KEY=sk-your-openai-api-key-here
 
 # Server
 HOST=0.0.0.0
@@ -228,6 +229,13 @@ PORT=8000
 # Limits
 MAX_FILE_SIZE=1073741824  # 1GB
 ```
+
+**⚠️ IMPORTANT:** You MUST add your OpenAI API key to generate Frida scripts!
+
+1. Get API key: https://platform.openai.com/api-keys
+2. Copy `.env.example` to `.env`
+3. Add your key: `OPENAI_API_KEY=sk-xxxxx`
+4. Restart FridaForge
 
 ---
 
@@ -372,13 +380,14 @@ PORT=8080
 - Java 11+ (for JADX/Apktool)
 - MongoDB 4.4+
 - 4GB RAM minimum (8GB recommended)
+- **OpenAI API Key** (required for script generation)
 
 ### Python Packages
 ```
 fastapi>=0.110.1
 uvicorn[standard]>=0.25.0
 motor>=3.3.1
-emergentintegrations>=0.1.0
+openai>=1.12.0
 python-magic>=0.4.27
 ```
 
@@ -415,7 +424,7 @@ MIT License - See [LICENSE](LICENSE) file for details.
 - **JADX** - Dex to Java decompiler
 - **Apktool** - APK resource extraction
 - **Frida** - Dynamic instrumentation framework
-- **OpenAI GPT-5.2** - AI-powered analysis
+- **OpenAI GPT-4** - AI-powered code analysis
 - **MobSF** - Inspiration for UI/UX
 
 ---
