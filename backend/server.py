@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, UploadFile, File, HTTPException, WebSocket, WebSocketDisconnect, Request
+from fastapi import FastAPI, APIRouter, UploadFile, File, HTTPException, WebSocket, WebSocketDisconnect, Request, BackgroundTasks
 from fastapi.responses import JSONResponse, FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -11,7 +11,7 @@ from pydantic import BaseModel, Field
 from typing import List, Dict, Optional
 import uuid
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 import asyncio
 import subprocess
 import tempfile
@@ -1153,7 +1153,106 @@ async def delete_analysis(analysis_id: str):
     result = await db.analyses.delete_one({"id": analysis_id})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Analysis not found")
+    
+    # Also delete uploaded file if exists
+    try:
+        for f in UPLOAD_DIR.glob(f"{analysis_id}_*"):
+            f.unlink()
+    except:
+        pass
+    
+    logger.info(f"Deleted analysis: {analysis_id}")
     return {"message": "Analysis deleted"}
+
+@api_router.post("/analysis/{analysis_id}/cancel")
+async def cancel_analysis(analysis_id: str):
+    """Cancel a stuck/processing analysis"""
+    result = await db.analyses.update_one(
+        {"id": analysis_id, "status": "processing"},
+        {"$set": {"status": "cancelled", "error_message": "Cancelled by user"}}
+    )
+    
+    if result.modified_count == 0:
+        # Check if it exists but isn't processing
+        existing = await db.analyses.find_one({"id": analysis_id})
+        if not existing:
+            raise HTTPException(status_code=404, detail="Analysis not found")
+        raise HTTPException(status_code=400, detail=f"Cannot cancel - status is '{existing['status']}'")
+    
+    logger.info(f"Cancelled analysis: {analysis_id}")
+    return {"message": "Analysis cancelled"}
+
+@api_router.post("/analysis/{analysis_id}/rescan")
+async def rescan_analysis(analysis_id: str, background_tasks: BackgroundTasks):
+    """Re-run analysis for an existing file"""
+    analysis = await db.analyses.find_one({"id": analysis_id})
+    if not analysis:
+        raise HTTPException(status_code=404, detail="Analysis not found")
+    
+    # Find the original file
+    original_file = None
+    for f in UPLOAD_DIR.glob(f"{analysis_id}_*"):
+        original_file = f
+        break
+    
+    if not original_file or not original_file.exists():
+        raise HTTPException(status_code=400, detail="Original file not found. Please upload again.")
+    
+    # Create new analysis entry
+    new_analysis_id = str(uuid.uuid4())
+    new_filename = f"{new_analysis_id}_{original_file.name.split('_', 1)[1]}"
+    new_file_path = UPLOAD_DIR / new_filename
+    
+    # Copy file
+    shutil.copy(original_file, new_file_path)
+    
+    # Create new analysis record
+    new_analysis = {
+        "id": new_analysis_id,
+        "filename": analysis["filename"],
+        "file_path": str(new_file_path),
+        "file_type": analysis.get("file_type", "apk"),
+        "file_size": analysis.get("file_size"),
+        "status": "processing",
+        "created_at": datetime.utcnow(),
+        "original_analysis_id": analysis_id
+    }
+    
+    await db.analyses.insert_one(new_analysis)
+    
+    # Start background analysis
+    background_tasks.add_task(start_analysis, new_analysis_id, str(new_file_path), analysis["filename"])
+    
+    logger.info(f"Re-scan started: {new_analysis_id} (original: {analysis_id})")
+    return {
+        "message": "Re-scan started",
+        "new_analysis_id": new_analysis_id,
+        "original_analysis_id": analysis_id
+    }
+
+@api_router.post("/cleanup-stuck")
+async def cleanup_stuck_scans():
+    """Mark all stuck 'processing' scans as cancelled"""
+    # Consider scans stuck if they've been processing for more than 30 minutes
+    cutoff_time = datetime.utcnow() - timedelta(minutes=30)
+    
+    result = await db.analyses.update_many(
+        {
+            "status": "processing",
+            "created_at": {"$lt": cutoff_time}
+        },
+        {"$set": {"status": "cancelled", "error_message": "Marked as stuck and cancelled"}}
+    )
+    
+    # Also mark any processing scans without a cutoff for immediate cleanup
+    result2 = await db.analyses.update_many(
+        {"status": "processing"},
+        {"$set": {"status": "cancelled", "error_message": "Cancelled during cleanup"}}
+    )
+    
+    total_cleaned = result.modified_count + result2.modified_count
+    logger.info(f"Cleaned up {total_cleaned} stuck scans")
+    return {"message": f"Cleaned up stuck scans", "cleaned": total_cleaned}
 
 # Include router
 app.include_router(api_router)

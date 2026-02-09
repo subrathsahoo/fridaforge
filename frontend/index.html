@@ -29,24 +29,11 @@
             justify-content: center;
             gap: 20px;
         }
-        .logo {
-            font-size: 1.2em;
-            animation: pulse 2s infinite;
-        }
-        .tagline {
-            font-size: 1.3em;
-            opacity: 0.95;
-            font-weight: 300;
-            margin-top: 10px;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
+        .logo { font-size: 1.2em; animation: pulse 2s infinite; }
+        .tagline { font-size: 1.3em; opacity: 0.95; font-weight: 300; margin-top: 10px; }
+        .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 14px; border-radius: 20px; font-size: 0.8em; margin: 5px; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
         .card {
             background: white;
             border-radius: 16px;
@@ -55,10 +42,21 @@
             margin-bottom: 30px;
             animation: slideUp 0.5s;
         }
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .tabs { display: flex; margin-bottom: 25px; border-bottom: 2px solid #eee; }
+        .tab {
+            padding: 15px 30px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.3s;
+            font-weight: 500;
+            color: #666;
         }
+        .tab:hover { color: #667eea; }
+        .tab.active { color: #667eea; border-bottom-color: #667eea; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
         .upload-zone {
             border: 3px dashed #667eea;
             border-radius: 12px;
@@ -74,20 +72,9 @@
             transform: translateY(-5px);
             box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
         }
-        .upload-zone.dragover {
-            background: linear-gradient(135deg, #e8ebff 0%, #d4d9ff 100%);
-            border-color: #764ba2;
-            border-style: solid;
-        }
-        .upload-icon {
-            font-size: 5em;
-            margin-bottom: 20px;
-            animation: bounce 2s infinite;
-        }
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
+        .upload-zone.dragover { background: linear-gradient(135deg, #e8ebff 0%, #d4d9ff 100%); border-color: #764ba2; border-style: solid; }
+        .upload-icon { font-size: 5em; margin-bottom: 20px; animation: bounce 2s infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
         .btn {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -98,178 +85,82 @@
             cursor: pointer;
             transition: all 0.3s;
             margin: 10px;
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
         }
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4); }
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 0.85em;
+            margin: 5px;
+            border-radius: 6px;
         }
-        .btn:active {
-            transform: translateY(-1px);
-        }
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-        .progress-container {
-            display: none;
-            margin: 30px 0;
-            animation: fadeIn 0.5s;
-        }
-        .progress-bar {
-            width: 100%;
-            height: 35px;
-            background: linear-gradient(90deg, #e0e0e0 0%, #f0f0f0 100%);
-            border-radius: 17px;
-            overflow: hidden;
-            position: relative;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
-        }
+        .btn-danger { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
+        .btn-warning { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+        .btn-success { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        .progress-container { display: none; margin-top: 30px; }
+        .progress-bar { background: #eee; border-radius: 10px; height: 24px; overflow: hidden; }
         .progress-fill {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             height: 100%;
-            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-            transition: width 0.3s ease;
+            transition: width 0.5s;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: bold;
-            font-size: 0.9em;
-            box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+            font-size: 0.85em;
         }
-        .progress-text {
-            text-align: center;
-            margin-top: 10px;
-            color: #666;
-            font-weight: 500;
-        }
-        .analysis-list { display: grid; gap: 20px; }
+        .progress-text { margin-top: 12px; color: #666; text-align: center; font-weight: 500; }
+        .analysis-list { margin-top: 20px; }
         .analysis-item {
             background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
-            padding: 20px;
+            border: 1px solid #e8ebff;
             border-radius: 12px;
-            border-left: 4px solid #667eea;
-            cursor: pointer;
+            padding: 20px;
+            margin-bottom: 15px;
             transition: all 0.3s;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            cursor: pointer;
         }
-        .analysis-item:hover {
-            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.2);
-            transform: translateX(5px) translateY(-2px);
-            border-left-width: 6px;
-        }
-        .filename {
-            font-weight: bold;
-            font-size: 1.1em;
-            color: #333;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        .analysis-item:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(102, 126, 234, 0.15); border-color: #667eea; }
         .status {
-            padding: 6px 16px;
+            display: inline-block;
+            padding: 5px 12px;
             border-radius: 20px;
-            font-size: 0.85em;
+            font-size: 0.8em;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
-        .status.completed { background: #d4edda; color: #155724; }
-        .status.processing { background: #fff3cd; color: #856404; animation: pulse 1.5s infinite; }
-        .status.failed { background: #f8d7da; color: #721c24; }
-        .status.pending { background: #d1ecf1; color: #0c5460; }
-        .tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #e0e0e0;
-        }
-        .tab {
-            padding: 12px 25px;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s;
-            font-weight: 500;
-            color: #666;
-        }
-        .tab:hover { color: #667eea; background: #f8f9ff; border-radius: 8px 8px 0 0; }
-        .tab.active {
-            border-bottom-color: #667eea;
-            color: #667eea;
-            font-weight: 700;
-        }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.5s; }
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            animation: fadeIn 0.3s;
-        }
+        .status.completed { background: #d1fae5; color: #065f46; }
+        .status.processing { background: #fef3c7; color: #92400e; }
+        .status.failed { background: #fee2e2; color: #991b1b; }
+        .status.cancelled { background: #e5e7eb; color: #4b5563; }
+        .filename { font-weight: 600; font-size: 1.1em; color: #333; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center; }
         .modal-content {
             background: white;
-            padding: 40px;
             border-radius: 16px;
-            max-width: 900px;
+            padding: 35px;
+            max-width: 800px;
+            width: 90%;
             max-height: 85vh;
             overflow-y: auto;
             position: relative;
-            animation: slideUp 0.3s;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
         }
-        .close-modal {
-            position: absolute;
-            top: 15px;
-            right: 25px;
-            font-size: 2.5em;
-            cursor: pointer;
-            color: #999;
-            transition: all 0.3s;
-            line-height: 1;
-        }
-        .close-modal:hover { color: #667eea; transform: rotate(90deg); }
+        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 30px; cursor: pointer; color: #999; }
+        .close-modal:hover { color: #333; }
         .script-btn {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
             border: none;
-            padding: 12px 24px;
-            border-radius: 6px;
+            padding: 12px 20px;
+            border-radius: 8px;
             cursor: pointer;
             margin: 5px;
-            font-size: 0.95em;
             transition: all 0.3s;
-            box-shadow: 0 3px 10px rgba(40, 167, 69, 0.3);
         }
-        .script-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(40, 167, 69, 0.5);
-        }
-        .badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 0.8em;
-            font-weight: 600;
-            margin-left: 10px;
-        }
-        .badge.ai { background: #764ba2; color: white; }
-        .badge.fast { background: #10b981; color: white; }
-        .footer {
-            text-align: center;
-            color: white;
-            margin-top: 40px;
-            opacity: 0.9;
-            font-size: 0.9em;
-        }
-        .footer a { color: white; text-decoration: underline; }
+        .script-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3); }
+        .footer { text-align: center; color: white; margin-top: 30px; opacity: 0.9; }
+        .action-buttons { display: flex; gap: 10px; margin-top: 10px; }
+        .action-buttons button { flex: 1; }
     </style>
 </head>
 <body>
@@ -282,21 +173,22 @@
             </h1>
             <p class="tagline">AI-Powered Mobile Security Analysis • Where Code Meets Bypasses</p>
             <div style="margin-top: 15px;">
-                <span class="badge ai">🤖 AI-Powered</span>
-                <span class="badge fast">⚡ 10x Faster</span>
+                <span class="badge">🤖 AI-Powered</span>
+                <span class="badge">⚡ Gemini 1.5 Flash</span>
+                <span class="badge">🆓 FREE</span>
             </div>
         </div>
 
         <div class="card">
             <div class="tabs">
                 <div class="tab active" onclick="switchTab('upload')">📤 Upload & Analyze</div>
-                <div class="tab" onclick="switchTab('history')">📜 Analysis History</div>
+                <div class="tab" onclick="switchTab('history')">📊 Analysis History</div>
             </div>
 
             <div id="upload-tab" class="tab-content active">
                 <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
                     <div class="upload-icon">📱</div>
-                    <h2>Drop APK/IPA file here or click to browse</h2>
+                    <h2 style="margin-bottom: 15px; color: #333;">Drop APK/IPA file here or click to browse</h2>
                     <p style="margin-top: 15px; color: #666; font-size: 1.1em;">Max size: 1GB • APK & IPA supported</p>
                     <p style="margin-top: 8px; color: #999;">AI will read the actual code and generate custom Frida scripts</p>
                     <input type="file" id="fileInput" accept=".apk,.ipa" style="display: none;" onchange="handleFile(this.files[0])">
@@ -312,7 +204,10 @@
             </div>
 
             <div id="history-tab" class="tab-content">
-                <h2 style="margin-bottom: 20px; color: #333;">📊 Recent Analyses</h2>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 style="color: #333;">📊 Recent Analyses</h2>
+                    <button class="btn btn-small btn-danger" onclick="cleanupStuckScans()">🧹 Cleanup Stuck Scans</button>
+                </div>
                 <div class="analysis-list" id="analysisList">
                     <p style="text-align: center; color: #666; padding: 40px;">Loading...</p>
                 </div>
@@ -321,7 +216,7 @@
 
         <div class="footer">
             <p>⚔️ <strong>FridaForge</strong> - Made with ❤️ for Security Professionals</p>
-            <p style="margin-top: 5px; font-size: 0.85em;">Powered by AI • GPT-5.2 • Multi-Agent Analysis</p>
+            <p style="margin-top: 5px; font-size: 0.85em;">Powered by Google Gemini 1.5 Flash (FREE)</p>
         </div>
     </div>
 
@@ -335,10 +230,17 @@
     <script>
         const API_BASE = '/api';
         let currentAnalysisId = null;
+        let autoRefreshInterval = null;
 
         function switchTab(tab) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            
+            // Clear auto-refresh when switching tabs
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+                autoRefreshInterval = null;
+            }
             
             if (tab === 'upload') {
                 document.querySelector('.tab:nth-child(1)').classList.add('active');
@@ -347,6 +249,12 @@
                 document.querySelector('.tab:nth-child(2)').classList.add('active');
                 document.getElementById('history-tab').classList.add('active');
                 loadAnalyses();
+                // Only auto-refresh if there are processing scans
+                autoRefreshInterval = setInterval(() => {
+                    if (document.getElementById('history-tab').classList.contains('active')) {
+                        loadAnalyses(true); // silent refresh
+                    }
+                }, 10000); // Refresh every 10 seconds instead of 5
             }
         }
 
@@ -422,14 +330,16 @@
                 const data = JSON.parse(event.data);
                 updateProgress(data.progress, data.message);
                 
-                if (data.status === 'completed') {
+                if (data.status === 'completed' || data.status === 'failed') {
                     loadAnalyses();
                     ws.close();
                 }
             };
+            
+            ws.onerror = () => ws.close();
         }
 
-        async function loadAnalyses() {
+        async function loadAnalyses(silent = false) {
             try {
                 const response = await fetch(`${API_BASE}/analyses`);
                 const analyses = await response.json();
@@ -442,25 +352,117 @@
                 }
                 
                 listEl.innerHTML = analyses.map(a => `
-                    <div class="analysis-item" onclick="viewDetails('${a.id}')">
+                    <div class="analysis-item">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                            <div class="filename">
+                            <div class="filename" onclick="viewDetails('${a.id}')">
                                 ${a.file_type === 'apk' ? '📱' : '🍎'} ${a.filename}
                             </div>
                             <div class="status ${a.status}">${a.status}</div>
                         </div>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; font-size: 0.9em; color: #666;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; font-size: 0.9em; color: #666;" onclick="viewDetails('${a.id}')">
                             <div>📅 ${new Date(a.created_at).toLocaleString()}</div>
                             <div>📦 ${a.file_size || 'N/A'}</div>
                             ${a.status === 'completed' ? `
-                            <div>🔍 ${a.detections?.length || 0} protections</div>
+                            <div>🔍 ${a.detections?.length || a.detection_summary?.reduce((sum, d) => sum + d.count, 0) || 0} protections</div>
                             <div>⚔️ ${a.frida_scripts?.length || 0} scripts</div>
+                            ` : ''}
+                        </div>
+                        <div class="action-buttons">
+                            ${a.status === 'completed' ? `
+                                <button class="btn btn-small btn-success" onclick="event.stopPropagation(); viewDetails('${a.id}')">👁️ View Results</button>
+                                <button class="btn btn-small btn-warning" onclick="event.stopPropagation(); rerunScan('${a.id}', '${a.filename}')">🔄 Re-scan</button>
+                                <button class="btn btn-small btn-danger" onclick="event.stopPropagation(); deleteScan('${a.id}')">🗑️ Delete</button>
+                            ` : a.status === 'processing' ? `
+                                <button class="btn btn-small btn-danger" onclick="event.stopPropagation(); cancelScan('${a.id}')">⏹️ Cancel</button>
+                            ` : a.status === 'failed' || a.status === 'cancelled' ? `
+                                <button class="btn btn-small btn-warning" onclick="event.stopPropagation(); rerunScan('${a.id}', '${a.filename}')">🔄 Retry</button>
+                                <button class="btn btn-small btn-danger" onclick="event.stopPropagation(); deleteScan('${a.id}')">🗑️ Delete</button>
                             ` : ''}
                         </div>
                     </div>
                 `).join('');
             } catch (error) {
-                console.error('Failed to load analyses:', error);
+                if (!silent) console.error('Failed to load analyses:', error);
+            }
+        }
+
+        async function deleteScan(analysisId) {
+            if (!confirm('Are you sure you want to delete this scan?')) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/analysis/${analysisId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    loadAnalyses();
+                } else {
+                    const data = await response.json();
+                    alert('Failed to delete: ' + data.detail);
+                }
+            } catch (error) {
+                alert('Delete error: ' + error.message);
+            }
+        }
+
+        async function cancelScan(analysisId) {
+            if (!confirm('Cancel this scan? It will be marked as cancelled.')) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/analysis/${analysisId}/cancel`, {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    loadAnalyses();
+                } else {
+                    const data = await response.json();
+                    alert('Failed to cancel: ' + data.detail);
+                }
+            } catch (error) {
+                alert('Cancel error: ' + error.message);
+            }
+        }
+
+        async function rerunScan(analysisId, filename) {
+            if (!confirm(`Re-scan ${filename}? This will start a new analysis.`)) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/analysis/${analysisId}/rescan`, {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert('Re-scan started! New analysis ID: ' + data.new_analysis_id);
+                    loadAnalyses();
+                } else {
+                    alert('Failed to re-scan: ' + data.detail);
+                }
+            } catch (error) {
+                alert('Re-scan error: ' + error.message);
+            }
+        }
+
+        async function cleanupStuckScans() {
+            if (!confirm('This will mark all stuck "processing" scans as "cancelled". Continue?')) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/cleanup-stuck`, {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert(`Cleaned up ${data.cleaned} stuck scans.`);
+                    loadAnalyses();
+                } else {
+                    alert('Cleanup failed: ' + data.detail);
+                }
+            } catch (error) {
+                alert('Cleanup error: ' + error.message);
             }
         }
 
@@ -476,39 +478,61 @@
                     <p style="color: #666; margin-top: 8px;"><strong>Status:</strong> <span class="status ${analysis.status}">${analysis.status}</span></p>
                 `;
                 
-                if (analysis.status === 'completed' && analysis.detections) {
-                    content += `
-                        <h3 style="margin-top: 35px; color: #333;">🔍 Security Protections Found (${analysis.detections.length})</h3>
-                        ${analysis.detections.slice(0, 10).map(d => `
-                            <div style="background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%); padding: 18px; margin: 12px 0; border-radius: 10px; border-left: 4px solid #667eea;">
-                                <strong style="color: #667eea; font-size: 1.05em;">${d.type.replace(/_/g, ' ').toUpperCase()}</strong>
-                                <p style="margin-top: 8px; font-size: 0.9em; color: #666;">📍 <code>${d.class_name}.${d.method_name}</code></p>
-                                <p style="margin-top: 6px; color: #777; font-size: 0.9em;">${d.description}</p>
-                            </div>
-                        `).join('')}
-                        
-                        <h3 style="margin-top: 35px; color: #333;">⚔️ Generated Frida Bypass Scripts</h3>
-                        <div style="background: #f8f9ff; padding: 20px; border-radius: 10px; margin: 15px 0;">
-                            ${analysis.frida_scripts.map(s => `
-                                <button class="script-btn" onclick="downloadScript('${analysis.id}', '${s.protection_type}')">
-                                    ⬇️ ${s.protection_type.replace(/_/g, ' ')}
-                                </button>
+                if (analysis.status === 'completed') {
+                    // Show detection summary if available
+                    if (analysis.detection_summary && analysis.detection_summary.length > 0) {
+                        content += `
+                            <h3 style="margin-top: 35px; color: #333;">🔍 Security Protections Found</h3>
+                            ${analysis.detection_summary.map(d => `
+                                <div style="background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%); padding: 18px; margin: 12px 0; border-radius: 10px; border-left: 4px solid #667eea;">
+                                    <strong style="color: #667eea; font-size: 1.05em;">${d.type.replace(/_/g, ' ').toUpperCase()}</strong>
+                                    <span style="background: #667eea; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.8em; margin-left: 10px;">${d.count} methods</span>
+                                    <div style="margin-top: 10px; font-size: 0.85em; color: #666;">
+                                        ${d.methods.slice(0, 5).map(m => `<code style="background: #eee; padding: 2px 6px; border-radius: 4px; margin: 2px;">${m.class}.${m.method}</code>`).join(' ')}
+                                        ${d.methods.length > 5 ? `<span style="color: #999;">... and ${d.methods.length - 5} more</span>` : ''}
+                                    </div>
+                                </div>
                             `).join('')}
-                            <button class="script-btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); margin-top: 15px; width: 100%; font-size: 1.1em;" onclick="downloadScript('${analysis.id}', 'combined')">
-                                ⚔️ Download Universal Bypass Script (All Protections)
-                            </button>
-                        </div>
-                    `;
+                        `;
+                    } else if (analysis.detections && analysis.detections.length > 0) {
+                        content += `
+                            <h3 style="margin-top: 35px; color: #333;">🔍 Security Protections Found (${analysis.detections.length})</h3>
+                            ${analysis.detections.slice(0, 10).map(d => `
+                                <div style="background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%); padding: 18px; margin: 12px 0; border-radius: 10px; border-left: 4px solid #667eea;">
+                                    <strong style="color: #667eea; font-size: 1.05em;">${d.type.replace(/_/g, ' ').toUpperCase()}</strong>
+                                    <p style="margin-top: 8px; font-size: 0.9em; color: #666;">📍 <code>${d.class_name}.${d.method_name}</code></p>
+                                </div>
+                            `).join('')}
+                        `;
+                    }
+                    
+                    if (analysis.frida_scripts && analysis.frida_scripts.length > 0) {
+                        content += `
+                            <h3 style="margin-top: 35px; color: #333;">⚔️ Generated Frida Bypass Scripts (${analysis.frida_scripts.length})</h3>
+                            <div style="background: #f8f9ff; padding: 20px; border-radius: 10px; margin: 15px 0;">
+                                ${analysis.frida_scripts.map(s => `
+                                    <button class="script-btn" onclick="downloadScript('${analysis.id}', '${s.protection_type}')">
+                                        ⬇️ ${s.protection_type.replace(/_/g, ' ')} (${s.targeted_methods?.length || 1} methods)
+                                    </button>
+                                `).join('')}
+                                <button class="script-btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); margin-top: 15px; width: 100%; font-size: 1.1em;" onclick="downloadScript('${analysis.id}', 'combined')">
+                                    ⚔️ Download Universal Bypass Script (All Protections)
+                                </button>
+                            </div>
+                        `;
+                    }
                 } else if (analysis.status === 'failed') {
-                    content += `<p style="color: #ef4444; margin-top: 25px; padding: 20px; background: #fee; border-radius: 10px;">❌ <strong>Analysis Failed:</strong> ${analysis.error_message}</p>`;
+                    content += `<p style="color: #ef4444; margin-top: 25px; padding: 20px; background: #fee; border-radius: 10px;">❌ <strong>Analysis Failed:</strong> ${analysis.error_message || 'Unknown error'}</p>`;
+                } else if (analysis.status === 'cancelled') {
+                    content += `<p style="color: #6b7280; margin-top: 25px; padding: 20px; background: #f3f4f6; border-radius: 10px;">⏹️ <strong>Analysis Cancelled</strong></p>`;
                 } else if (analysis.status === 'processing') {
-                    content += `<p style="color: #f59e0b; margin-top: 25px; padding: 20px; background: #fffbeb; border-radius: 10px;">⚙️ Analysis in progress... Please wait.</p>`;
+                    content += `<p style="color: #f59e0b; margin-top: 25px; padding: 20px; background: #fffbeb; border-radius: 10px;">⚙️ Analysis in progress... Please wait or cancel if stuck.</p>`;
                 }
                 
                 document.getElementById('modalContent').innerHTML = content;
                 document.getElementById('detailsModal').style.display = 'flex';
             } catch (error) {
-                alert('Failed to load details');
+                alert('Failed to load details: ' + error.message);
             }
         }
 
@@ -520,13 +544,7 @@
             window.open(`${API_BASE}/download/${analysisId}/${scriptType}`, '_blank');
         }
 
-        setInterval(() => {
-            if (document.getElementById('history-tab').classList.contains('active')) {
-                loadAnalyses();
-            }
-        }, 5000);
-
-        // Don't auto-fetch on page load - only when user clicks History tab
+        // Don't auto-load on page start - wait for user to click History tab
     </script>
 </body>
 </html>
