@@ -10,6 +10,7 @@ from pathlib import Path
 from pydantic import BaseModel, Field
 from typing import List, Dict, Optional
 import uuid
+import sys
 from datetime import datetime
 import asyncio
 import subprocess
@@ -18,6 +19,8 @@ import shutil
 import re
 import json
 import zipfile
+import sys
+import hashlib
 from openai import AsyncOpenAI
 
 load_dotenv()
