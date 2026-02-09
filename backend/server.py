@@ -19,8 +19,8 @@ import shutil
 import re
 import json
 import zipfile
-import sys
 import hashlib
+import traceback
 from openai import AsyncOpenAI
 
 load_dotenv()
@@ -320,35 +320,38 @@ class IntelligentCodeAnalyzer:
         
         return '\n'.join(logic_lines[:15])  # First 15 logic lines
 
-# AI-POWERED SCRIPT GENERATOR - Generates scripts based on ACTUAL code
+# AI-POWERED SCRIPT GENERATOR - Generates scripts based on ACTUAL code using OpenAI GPT-4o
 class AIFridaScriptGenerator:
     def __init__(self):
-        self.llm_chat = None
-    
-    async def initialize(self):
-        self.llm_chat = LlmChat(
-            api_key=EMERGENT_LLM_KEY,
-            session_id=f"frida_gen_{uuid.uuid4()}",
-            system_message="""You are an expert mobile security researcher and Frida instrumentation specialist.
+        self.client = None
+        self.system_message = """You are an expert mobile security researcher and Frida instrumentation specialist.
             
 Your task: Analyze REAL decompiled Android/iOS code and generate precise Frida hooks to bypass security protections.
             
 IMPORTANT RULES:
-            1. Read the ACTUAL code provided - do NOT use generic templates
-            2. Use the EXACT class names, method names, and signatures from the code
-            3. Understand the protection LOGIC and bypass it intelligently
-            4. Handle obfuscated code by analyzing the logic, not just names
-            5. Generate production-ready hooks with error handling
-            6. Include alternatives if primary hook fails
-            7. Add detailed comments explaining WHY each hook works
-            8. Return ONLY JavaScript code, no explanations outside comments
+1. Read the ACTUAL code provided - do NOT use generic templates
+2. Use the EXACT class names, method names, and signatures from the code
+3. Understand the protection LOGIC and bypass it intelligently
+4. Handle obfuscated code by analyzing the logic, not just names
+5. Generate production-ready hooks with error handling
+6. Include alternatives if primary hook fails
+7. Add detailed comments explaining WHY each hook works
+8. Return ONLY JavaScript code, no explanations outside comments
             
 You MUST analyze the provided code deeply and create custom bypasses for THAT specific implementation."""
-        ).with_model("openai", "gpt-5.2")
+    
+    async def initialize(self):
+        api_key = os.environ.get('OPENAI_API_KEY')
+        if not api_key:
+            logger.error("No OpenAI API key found! Set OPENAI_API_KEY in .env")
+            raise ValueError("OpenAI API key not configured. Get one from https://platform.openai.com/api-keys")
+        
+        logger.info("Initializing OpenAI client (GPT-4o) for Frida script generation...")
+        self.client = AsyncOpenAI(api_key=api_key)
     
     async def generate_script_from_actual_code(self, detection: Detection) -> FridaScript:
-        """Generate Frida script based on ACTUAL decompiled code"""
-        if not self.llm_chat:
+        """Generate Frida script based on ACTUAL decompiled code using GPT-4o"""
+        if not self.client:
             await self.initialize()
         
         # Create detailed prompt with ACTUAL code
@@ -383,13 +386,25 @@ Generate ONLY the Frida JavaScript code with detailed comments.
 Start with Java.perform() and include the complete working hook."""
         
         try:
-            message = UserMessage(text=prompt)
-            response = await self.llm_chat.send_message(message)
+            logger.info(f"Calling GPT-4o to generate Frida script for {detection.class_name}.{detection.method_name}")
+            
+            response = await self.client.chat.completions.create(
+                model="gpt-4o",
+                messages=[
+                    {"role": "system", "content": self.system_message},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.7,
+                max_tokens=2000
+            )
             
             # Clean up response (remove markdown if present)
-            script_code = response.strip()
+            script_code = response.choices[0].message.content.strip()
             if script_code.startswith('```'):
-                script_code = '\n'.join(script_code.split('\n')[1:-1])
+                lines = script_code.split('\n')
+                script_code = '\n'.join(lines[1:-1]) if len(lines) > 2 else script_code
+            
+            logger.info(f"✓ Successfully generated Frida script for {detection.class_name}.{detection.method_name}")
             
             return FridaScript(
                 protection_type=detection.type,
@@ -401,6 +416,7 @@ Start with Java.perform() and include the complete working hook."""
             )
         except Exception as e:
             logger.error(f"Script generation failed: {e}")
+            logger.error(traceback.format_exc())
             # Fallback: Generate basic hook
             return self._generate_fallback_script(detection)
     
@@ -430,7 +446,7 @@ Start with Java.perform() and include the complete working hook."""
         )
     
     async def generate_combined_script(self, scripts: List[FridaScript], app_info: str) -> str:
-        """Generate unified bypass script for all protections found"""
+        """Generate unified bypass script for all protections found using GPT-4o"""
         if not self.client:
             await self.initialize()
         
@@ -456,14 +472,16 @@ Start with Java.perform() and include the complete working hook."""
 Return ONLY the complete JavaScript code."""
         
         try:
+            logger.info(f"Calling GPT-4o to generate combined universal bypass script...")
+            
             response = await self.client.chat.completions.create(
-                model="gpt-4",
+                model="gpt-4o",
                 messages=[
                     {"role": "system", "content": "You are an expert Frida script developer. Combine multiple bypass scripts into one optimized universal script."},
                     {"role": "user", "content": prompt}
                 ],
                 temperature=0.7,
-                max_tokens=2000
+                max_tokens=3000
             )
             
             script_code = response.choices[0].message.content.strip()
@@ -471,8 +489,10 @@ Return ONLY the complete JavaScript code."""
                 lines = script_code.split('\n')
                 script_code = '\n'.join(lines[1:-1]) if len(lines) > 2 else script_code
             
+            logger.info(f"✓ Successfully generated combined universal bypass script")
             return script_code
-        except:
+        except Exception as e:
+            logger.error(f"Combined script generation failed: {e}")
             # Fallback: Simple combination
             return f"""// Universal Bypass Script\n// Generated for: {app_info}\n\nJava.perform(function() {{\n    console.log('[*] Loading {len(scripts)} bypasses...');\n    {all_scripts}\n    console.log('[*] All bypasses loaded');\n}});"""
 
@@ -954,7 +974,7 @@ async def improve_script_with_error(
 Return ONLY the fixed JavaScript code."""
         
         response = await script_generator.client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4o",
             messages=[
                 {"role": "system", "content": "You are a Frida expert. Fix broken scripts based on error messages."},
                 {"role": "user", "content": improvement_prompt}
@@ -1027,16 +1047,19 @@ app.add_middleware(
 )
 
 # Serve static files for web UI
-static_dir = Path(__file__).parent.parent / "frontend"
+static_dir = Path(__file__).parent / "frontend"
 if static_dir.exists():
+    logger.info(f"Serving static files from: {static_dir}")
     app.mount("/", StaticFiles(directory=str(static_dir), html=True), name="static")
+else:
+    logger.warning(f"Static files directory not found: {static_dir}")
 
 @app.on_event("startup")
 async def startup_event():
     """Check API key on startup"""
-    api_key = os.environ.get('OPENAI_API_KEY') or os.environ.get('EMERGENT_LLM_KEY')
+    api_key = os.environ.get('OPENAI_API_KEY')
     
-    if not api_key or api_key == 'sk-emergent-2A7FcC7D5433bFdC80':
+    if not api_key:
         logger.warning("=" * 80)
         logger.warning("⚠️  WARNING: OpenAI API Key Not Configured!")
         logger.warning("=" * 80)
@@ -1054,7 +1077,10 @@ async def startup_event():
         logger.warning("")
         logger.warning("=" * 80)
     else:
-        logger.info("✓ OpenAI API key configured successfully")
+        logger.info("=" * 80)
+        logger.info("✓ FridaForge - OpenAI API key configured (GPT-4o)")
+        logger.info("✓ Ready to analyze APK/IPA files")
+        logger.info("=" * 80)
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
