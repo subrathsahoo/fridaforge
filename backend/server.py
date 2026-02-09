@@ -1047,7 +1047,7 @@ app.add_middleware(
 )
 
 # Serve static files for web UI
-static_dir = Path(__file__).parent / "frontend"
+static_dir = Path(__file__).parent.parent / "frontend"
 if static_dir.exists():
     logger.info(f"Serving static files from: {static_dir}")
     app.mount("/", StaticFiles(directory=str(static_dir), html=True), name="static")
