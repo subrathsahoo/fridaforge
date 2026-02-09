@@ -10,9 +10,6 @@ pymongo==4.5.0
 # AI Integration (OpenAI)
 openai>=1.12.0
 
-# File Processing
-python-magic==0.4.27
-
 # Security & Validation
 python-dotenv>=1.0.1
 cryptography>=42.0.8

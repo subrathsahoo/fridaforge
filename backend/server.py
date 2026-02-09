@@ -17,7 +17,6 @@ import tempfile
 import shutil
 import re
 import json
-import magic
 import zipfile
 from openai import AsyncOpenAI
 
