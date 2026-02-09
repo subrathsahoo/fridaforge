@@ -21,7 +21,7 @@ import json
 import zipfile
 import hashlib
 import traceback
-from openai import AsyncOpenAI
+import google.generativeai as genai
 
 load_dotenv()
 
@@ -320,10 +320,10 @@ class IntelligentCodeAnalyzer:
         
         return '\n'.join(logic_lines[:15])  # First 15 logic lines
 
-# AI-POWERED SCRIPT GENERATOR - Generates scripts based on ACTUAL code using OpenAI GPT-4o
+# AI-POWERED SCRIPT GENERATOR - Uses Google Gemini 1.5 Flash (FREE)
 class AIFridaScriptGenerator:
     def __init__(self):
-        self.client = None
+        self.model = None
         self.system_message = """You are an expert mobile security researcher and Frida instrumentation specialist.
             
 Your task: Analyze REAL decompiled Android/iOS code and generate precise Frida hooks to bypass security protections.
@@ -341,17 +341,21 @@ IMPORTANT RULES:
 You MUST analyze the provided code deeply and create custom bypasses for THAT specific implementation."""
     
     async def initialize(self):
-        api_key = os.environ.get('OPENAI_API_KEY')
+        api_key = os.environ.get('GEMINI_API_KEY') or os.environ.get('GOOGLE_API_KEY')
         if not api_key:
-            logger.error("No OpenAI API key found! Set OPENAI_API_KEY in .env")
-            raise ValueError("OpenAI API key not configured. Get one from https://platform.openai.com/api-keys")
+            logger.error("No Gemini API key found! Set GEMINI_API_KEY in .env")
+            raise ValueError("Gemini API key not configured. Get FREE key from: https://makersuite.google.com/app/apikey")
         
-        logger.info("Initializing OpenAI client (GPT-4o) for Frida script generation...")
-        self.client = AsyncOpenAI(api_key=api_key)
+        logger.info("Initializing Google Gemini 1.5 Flash (FREE) for Frida script generation...")
+        genai.configure(api_key=api_key)
+        self.model = genai.GenerativeModel(
+            model_name='gemini-1.5-flash',
+            system_instruction=self.system_message
+        )
     
     async def generate_script_from_actual_code(self, detection: Detection) -> FridaScript:
-        """Generate Frida script based on ACTUAL decompiled code using GPT-4o"""
-        if not self.client:
+        """Generate Frida script based on ACTUAL decompiled code using Gemini 1.5 Flash"""
+        if not self.model:
             await self.initialize()
         
         # Create detailed prompt with ACTUAL code
@@ -386,23 +390,20 @@ Generate ONLY the Frida JavaScript code with detailed comments.
 Start with Java.perform() and include the complete working hook."""
         
         try:
-            logger.info(f"Calling GPT-4o to generate Frida script for {detection.class_name}.{detection.method_name}")
+            logger.info(f"Calling Gemini 1.5 Flash to generate Frida script for {detection.class_name}.{detection.method_name}")
             
-            response = await self.client.chat.completions.create(
-                model="gpt-4o",
-                messages=[
-                    {"role": "system", "content": self.system_message},
-                    {"role": "user", "content": prompt}
-                ],
-                temperature=0.7,
-                max_tokens=2000
+            response = await asyncio.to_thread(
+                self.model.generate_content,
+                prompt
             )
             
             # Clean up response (remove markdown if present)
-            script_code = response.choices[0].message.content.strip()
+            script_code = response.text.strip()
             if script_code.startswith('```'):
                 lines = script_code.split('\n')
                 script_code = '\n'.join(lines[1:-1]) if len(lines) > 2 else script_code
+            if script_code.endswith('```'):
+                script_code = script_code[:-3].strip()
             
             logger.info(f"✓ Successfully generated Frida script for {detection.class_name}.{detection.method_name}")
             
@@ -446,8 +447,8 @@ Start with Java.perform() and include the complete working hook."""
         )
     
     async def generate_consolidated_script_for_type(self, protection_type: str, detections: List[Detection]) -> FridaScript:
-        """Generate ONE consolidated Frida script for ALL methods of the same protection type"""
-        if not self.client:
+        """Generate ONE consolidated Frida script for ALL methods of the same protection type using Gemini"""
+        if not self.model:
             await self.initialize()
         
         # Prepare code samples from all detections (limit to avoid token overflow)
@@ -492,22 +493,19 @@ Start with Java.perform() and include the complete working hook."""
 Generate ONLY the Frida JavaScript code with comments."""
         
         try:
-            logger.info(f"Calling GPT-4o to generate consolidated {protection_type} bypass script...")
+            logger.info(f"Calling Gemini 1.5 Flash to generate consolidated {protection_type} bypass script...")
             
-            response = await self.client.chat.completions.create(
-                model="gpt-4o",
-                messages=[
-                    {"role": "system", "content": self.system_message},
-                    {"role": "user", "content": prompt}
-                ],
-                temperature=0.7,
-                max_tokens=4000
+            response = await asyncio.to_thread(
+                self.model.generate_content,
+                prompt
             )
             
-            script_code = response.choices[0].message.content.strip()
+            script_code = response.text.strip()
             if script_code.startswith('```'):
                 lines = script_code.split('\n')
                 script_code = '\n'.join(lines[1:-1]) if len(lines) > 2 else script_code
+            if script_code.endswith('```'):
+                script_code = script_code[:-3].strip()
             
             logger.info(f"✓ Successfully generated consolidated {protection_type} script!")
             
@@ -562,8 +560,8 @@ Java.perform(function() {{
         )
     
     async def generate_combined_script(self, scripts: List[FridaScript], app_info: str) -> str:
-        """Generate unified bypass script for all protections found using GPT-4o"""
-        if not self.client:
+        """Generate unified bypass script for all protections found using Gemini 1.5 Flash"""
+        if not self.model:
             await self.initialize()
         
         all_scripts = "\n\n".join([f"// {s.protection_type} - {s.targeted_class}\n{s.script}" for s in scripts])
@@ -588,22 +586,19 @@ Java.perform(function() {{
 Return ONLY the complete JavaScript code."""
         
         try:
-            logger.info(f"Calling GPT-4o to generate combined universal bypass script...")
+            logger.info(f"Calling Gemini 1.5 Flash to generate combined universal bypass script...")
             
-            response = await self.client.chat.completions.create(
-                model="gpt-4o",
-                messages=[
-                    {"role": "system", "content": "You are an expert Frida script developer. Combine multiple bypass scripts into one optimized universal script."},
-                    {"role": "user", "content": prompt}
-                ],
-                temperature=0.7,
-                max_tokens=3000
+            response = await asyncio.to_thread(
+                self.model.generate_content,
+                prompt
             )
             
-            script_code = response.choices[0].message.content.strip()
+            script_code = response.text.strip()
             if script_code.startswith('```'):
                 lines = script_code.split('\n')
                 script_code = '\n'.join(lines[1:-1]) if len(lines) > 2 else script_code
+            if script_code.endswith('```'):
+                script_code = script_code[:-3].strip()
             
             logger.info(f"✓ Successfully generated combined universal bypass script")
             return script_code
@@ -1102,22 +1097,19 @@ async def improve_script_with_error(
 
 Return ONLY the fixed JavaScript code."""
         
-        response = await script_generator.client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {"role": "system", "content": "You are a Frida expert. Fix broken scripts based on error messages."},
-                {"role": "user", "content": improvement_prompt}
-            ],
-            temperature=0.7,
-            max_tokens=2000
+        response = await asyncio.to_thread(
+            script_generator.model.generate_content,
+            improvement_prompt
         )
         
-        improved_script = response.choices[0].message.content.strip()
+        improved_script = response.text.strip()
         
         # Clean up markdown
         if improved_script.startswith('```'):
             lines = improved_script.split('\n')
             improved_script = '\n'.join(lines[1:-1]) if len(lines) > 2 else improved_script
+        if improved_script.endswith('```'):
+            improved_script = improved_script[:-3].strip()
         
         # Update the script in database
         for i, script in enumerate(scripts):
@@ -1186,20 +1178,19 @@ else:
 @app.on_event("startup")
 async def startup_event():
     """Check API key on startup"""
-    api_key = os.environ.get('OPENAI_API_KEY')
+    api_key = os.environ.get('GEMINI_API_KEY') or os.environ.get('GOOGLE_API_KEY')
     
     if not api_key:
         logger.warning("=" * 80)
-        logger.warning("⚠️  WARNING: OpenAI API Key Not Configured!")
+        logger.warning("⚠️  WARNING: Gemini API Key Not Configured!")
         logger.warning("=" * 80)
         logger.warning("")
-        logger.warning("FridaForge requires an OpenAI API key to generate Frida scripts.")
+        logger.warning("FridaForge requires a Google Gemini API key (FREE) to generate Frida scripts.")
         logger.warning("")
         logger.warning("To add your API key:")
-        logger.warning("  1. Get your key from: https://platform.openai.com/api-keys")
-        logger.warning("  2. Copy .env.example to .env")
-        logger.warning("  3. Add your key: OPENAI_API_KEY=sk-your-key-here")
-        logger.warning("  4. Restart FridaForge: ./run.sh")
+        logger.warning("  1. Get FREE key from: https://makersuite.google.com/app/apikey")
+        logger.warning("  2. Add to .env: GEMINI_API_KEY=your-key-here")
+        logger.warning("  3. Restart FridaForge: ./run.sh")
         logger.warning("")
         logger.warning("Without an API key, FridaForge can only decompile and detect")
         logger.warning("protections, but cannot generate Frida bypass scripts.")
@@ -1207,7 +1198,7 @@ async def startup_event():
         logger.warning("=" * 80)
     else:
         logger.info("=" * 80)
-        logger.info("✓ FridaForge - OpenAI API key configured (GPT-4o)")
+        logger.info("✓ FridaForge - Gemini 1.5 Flash configured (FREE)")
         logger.info("✓ Ready to analyze APK/IPA files")
         logger.info("=" * 80)
 
